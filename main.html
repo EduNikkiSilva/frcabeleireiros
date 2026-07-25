@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FR Cabeleireiros</title>
+  <link rel="icon" type="image/x-icon" href="img/fr.ico">
+
+  <!-- FLATPICKR -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+  <!-- CSS PRINCIPAL DO SITE -->
+  <link rel="stylesheet" href="css/main.css">
+
+  <!-- Nhost -->
+  <script type="module" src="js/nhost.js"></script>
+</head>
+
+<body>
+
+<header>
+  <div class="header-left">
+    <a href="main.html">
+      <img src="img/fr.png" class="logo" alt="FR Cabeleireiros">
+    </a>
+    <h1>FR Cabeleireiros</h1>
+  </div>
+
+  <button id="scroll-btn">Fazer reserva</button>
+</header>
+
+<div class="layout">
+
+  <!-- FORMULÁRIO À ESQUERDA -->
+  <section id="reserva" class="form-section">
+    <h2>Fazer marcação</h2>
+
+    <form id="booking-form">
+      <label>Barbeiro</label>
+      <select name="barber" id="barber" required>
+        <option value="">Escolhe o barbeiro</option>
+        <option value="2703d3fa-b5b5-419a-94ba-00773fe80bb6">Francisco Rodrigues</option>
+        <option value="450143b2-8d3a-4af2-8905-1151d89e561c">Ricardo Pires</option>
+      </select>
+      <p id="ferias-info" style="color:#b91c1c; font-weight:600; margin-top:-5px;"></p>
+
+      <label>Serviço</label>
+      <select name="service" required>
+        <option value="">Escolhe o serviço</option>
+        <option value="corte e lavagem">Corte e Lavagem</option>
+      </select>
+
+      <label>Data</label>
+      <input type="text" name="date" id="date" required />
+
+      <label>Hora</label>
+      <select id="time" name="time" required>
+        <option value="">Escolhe a hora</option>
+      </select>
+
+      <label>Nome</label>
+      <input type="text" name="name" required />
+
+      <label>Telemóvel</label>
+      <input type="tel" name="phone" required />
+
+      <button type="submit" class="btn-reserva">Confirmar marcação</button>
+</form>
+  </section>
+
+  <!-- COLUNA DIREITA -->
+  <div class="right-column">
+
+    <div class="team-title">A equipa da FR Cabeleireiros</div>
+
+    <div class="barbers-grid">
+      <div class="barber-card">
+        <img src="img/francisco.jpg" alt="Francisco Rodrigues">
+        <h3>Francisco Rodrigues</h3>
+      </div>
+
+      <div class="barber-card">
+        <img src="img/ricardo2.jpg" alt="Ricardo Pires">
+        <h3>Ricardo Pires</h3>
+      </div>
+    </div>
+
+    <section class="map-card-section">
+      <h2>Onde estamos</h2>
+
+      <div class="map-wrapper">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1885.4007287702202!2d-7.5044570011774745!3d39.81765977832241!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd3d5ea1d1367c61%3A0xb8ce64fd21ff2a9!2sFR%20Cabeleireiros!5e1!3m2!1spt-PT!2spt!4v1780603208853!5m2!1spt-PT!2spt"
+          style="border:0;"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+
+      <p class="map-caption">📍 Visita‑nos aqui</p>
+    </section>
+
+  </div>
+</div>
+
+<div id="popup">Reserva confirmada!</div>
+
+<!-- JS -->
+<script type="module" src="js/main.js"></script>
+
+</body>
+</html>
