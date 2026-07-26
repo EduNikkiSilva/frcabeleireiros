@@ -43,44 +43,75 @@
   <div id="bemvindo"></div>
 
   <!-- ABA: MARCAÇÕES -->
-<section class="tab-content active" id="tab-marcacoes">
-  <section class="card card-full">
-    <h2>As minhas marcações</h2>
+  <section class="tab-content active" id="tab-marcacoes">
+    <div class="marcacoes-grid">
 
-    <div class="list" id="lista-reservas">
-      <div class="list-empty">Sem marcações.</div>
+      <!-- COLUNA ESQUERDA: LISTA -->
+      <section class="card">
+        <h2>As minhas marcações</h2>
+        <p id="resumo-hoje" class="resumo-dia"></p>
+
+        <div class="list" id="lista-reservas">
+          <div class="list-empty">Sem marcações.</div>
+        </div>
+
+        <button id="btn-historico" class="btn-secondary" style="margin-top:1rem;">
+          📅 Ver histórico
+        </button>
+
+        <div id="historico-filtros" style="display:none; margin-top:0.7rem;">
+          <div class="form-row">
+            <div>
+              <label>Ver um dia específico</label>
+              <input type="date" id="historico-dia" class="input-modern" />
+            </div>
+            <div>
+              <label>Ver um mês inteiro</label>
+              <input type="month" id="historico-mes" class="input-modern" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- COLUNA DIREITA: FORMULÁRIO MANUAL -->
+      <section class="card">
+        <h2>Registar marcação manual</h2>
+        <p class="form-hint">Para clientes que ligam por telefone</p>
+
+        <div class="form-row">
+          <div>
+            <label>Data</label>
+            <input type="text" id="manual-data" class="input-modern" placeholder="Escolhe a data" />
+          </div>
+          <div>
+            <label>Hora</label>
+            <select id="manual-hora" class="input-modern">
+              <option value="">Escolhe a data primeiro</option>
+            </select>
+          </div>
+        </div>
+
+        <label>Serviço</label>
+        <select id="manual-servico" class="input-modern">
+          <option value="corte e lavagem">Corte e Lavagem</option>
+        </select>
+
+        <div class="form-row">
+          <div>
+            <label>Nome do cliente</label>
+            <input type="text" id="manual-nome" class="input-modern" placeholder="Nome" />
+          </div>
+          <div>
+            <label>Telemóvel</label>
+            <input type="tel" id="manual-telemovel" class="input-modern" placeholder="9XXXXXXXX" />
+          </div>
+        </div>
+
+        <button id="btn-add-manual" class="btn-primary">➕ Registar marcação</button>
+      </section>
+
     </div>
-
-    <button id="btn-historico" class="btn-secondary" style="margin-top:1rem;">
-      📅 Ver histórico
-    </button>
-
-    <input type="month" id="historico-mes" class="input-modern" style="display:none; margin-top:0.7rem;">
-
-    <h3 class="subtitle" style="margin-top:1.8rem;">Registar marcação manual (telefone)</h3>
-
-    <label>Data</label>
-    <input type="text" id="manual-data" class="input-modern" placeholder="Escolhe a data" />
-
-    <label>Hora</label>
-    <select id="manual-hora" class="input-modern">
-      <option value="">Escolhe a data primeiro</option>
-    </select>
-
-    <label>Serviço</label>
-    <select id="manual-servico" class="input-modern">
-      <option value="corte e lavagem">Corte e Lavagem</option>
-    </select>
-
-    <label>Nome do cliente</label>
-    <input type="text" id="manual-nome" class="input-modern" placeholder="Nome" />
-
-    <label>Telemóvel do cliente</label>
-    <input type="tel" id="manual-telemovel" class="input-modern" placeholder="9XXXXXXXX" />
-
-    <button id="btn-add-manual" class="btn-primary">➕ Registar marcação</button>
   </section>
-</section>
 
   <!-- ABA: FÉRIAS -->
   <section class="tab-content" id="tab-ferias">
@@ -93,49 +124,94 @@
 
       <h3 class="subtitle">Adicionar férias</h3>
 
-      <input type="date" id="ferias-inicio" class="input-modern" />
-      <input type="date" id="ferias-fim" class="input-modern" />
+      <label>Escolhe o período</label>
+      <input type="text" id="ferias-range" class="input-modern" placeholder="Escolhe o intervalo de férias" />
 
       <button id="btn-add-ferias" class="btn-primary">➕ Guardar férias</button>
     </section>
   </section>
 
   <!-- ABA: PAUSAS -->
-  <section class="tab-content" id="tab-pausas">
-    <section class="card card-full">
+  <!-- ABA: PAUSAS -->
+<section class="tab-content" id="tab-pausas">
+  <div class="marcacoes-grid">
+
+    <!-- COLUNA ESQUERDA: LISTA -->
+    <section class="card">
       <h2>Pausas / Almoço</h2>
 
       <div class="list" id="lista-pausas">
         <div class="list-empty">Sem pausas registadas.</div>
       </div>
+    </section>
 
-      <h3 class="subtitle">Adicionar pausa</h3>
+    <!-- COLUNA DIREITA: FORMULÁRIO -->
+    <section class="card">
+      <h2>Adicionar pausa</h2>
 
-      <label>Data início</label>
-      <input type="date" id="pausa-data" class="input-modern" />
+      <label>Escolhe o período (clica no primeiro e no último dia)</label>
+      <input type="text" id="pausa-range" class="input-modern" placeholder="Escolhe o intervalo de dias" />
 
-      <label>Data fim</label>
-      <input type="date" id="pausa-data-fim" class="input-modern" />
-
-      <label>Hora início</label>
-      <input type="time" id="pausa-inicio" class="input-modern" />
-
-      <label>Hora fim</label>
-      <input type="time" id="pausa-fim" class="input-modern" />
+      <div class="form-row">
+        <div>
+          <label>Hora início</label>
+          <input type="text" id="pausa-inicio" class="input-modern" placeholder="Escolhe a hora" />
+        </div>
+        <div>
+          <label>Hora fim</label>
+          <input type="text" id="pausa-fim" class="input-modern" placeholder="Escolhe a hora" />
+        </div>
+      </div>
 
       <button id="btn-add-pausa" class="btn-primary">➕ Guardar pausa</button>
     </section>
-  </section>
 
-  <!-- ABA: CONTA (por implementar na Fase 3) -->
-  <section class="tab-content" id="tab-conta">
-    <section class="card card-full">
-      <h2>A minha conta</h2>
-      <p class="list-empty">Em breve: alterar username e password.</p>
-    </section>
-  </section>
+  </div>
+</section>
 
-</div>
+<!-- ABA: CONTA -->
+<section class="tab-content" id="tab-conta">
+  <section class="card card-full">
+    <h2>A minha conta</h2>
+    <p class="conta-username">Sessão iniciada como <strong id="conta-username-atual">...</strong></p>
+
+    <div class="conta-secao">
+      <h3 class="subtitle">Confirmar identidade</h3>
+      <p class="form-hint">Introduz a tua password atual para poderes alterar os dados abaixo</p>
+
+      <label>Password atual</label>
+      <div class="password-wrapper">
+        <input type="password" id="conta-password-atual" class="input-modern" placeholder="Password atual" />
+        <button type="button" class="toggle-password" data-target="conta-password-atual">👁️</button>
+      </div>
+    </div>
+
+    <div class="conta-divider"></div>
+
+    <div class="conta-secao">
+      <h3 class="subtitle">Novos dados (opcional)</h3>
+
+      <label>Novo username</label>
+      <input type="text" id="conta-novo-username" class="input-modern" placeholder="Deixa em branco para não alterar" />
+
+      <label>Nova password</label>
+      <div class="password-wrapper">
+        <input type="password" id="conta-nova-password" class="input-modern" placeholder="Deixa em branco para não alterar" />
+        <button type="button" class="toggle-password" data-target="conta-nova-password">👁️</button>
+      </div>
+
+      <label>Confirmar nova password</label>
+      <div class="password-wrapper">
+        <input type="password" id="conta-confirmar-password" class="input-modern" placeholder="Repete a nova password" />
+        <button type="button" class="toggle-password" data-target="conta-confirmar-password">👁️</button>
+      </div>
+    </div>
+
+    <p class="conta-aviso">🔒 Usa uma password que só tu conheces e não partilhes com ninguém.</p>
+
+    <button id="btn-guardar-conta" class="btn-primary">💾 Guardar alterações</button>
+  </section>
+</section>
 
 <!-- MODAL -->
 <div id="modal-bg">
@@ -168,5 +244,9 @@
   });
 </script>
 
+<footer class="login-footer">
+    FR Cabeleireiros © 2026
+  </footer>
+  
 </body>
 </html>

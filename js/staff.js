@@ -58,6 +58,8 @@ async function checkSession() {
   await carregarPausas();
   await carregarFeriasRanges();
   iniciarFlatpickrManual();
+  iniciarFlatpickrFerias();
+  iniciarFlatpickrPausa();
 }
 
 /* ---------------- CARREGAR DADOS ---------------- */
@@ -67,6 +69,7 @@ async function carregarBarbeiro() {
     query GetBarbeiro($id: uuid!) {
       barbeiros(where: { id: { _eq: $id } }) {
         nome
+        username
       }
     }
   `;
@@ -77,6 +80,9 @@ async function carregarBarbeiro() {
   if (data) {
     document.getElementById("bemvindo").textContent =
       "Olá, " + data.nome + " 👋";
+
+    const contaUsername = document.getElementById("conta-username-atual");
+    if (contaUsername) contaUsername.textContent = data.username;
   }
 }
 
@@ -105,19 +111,31 @@ async function carregarReservas() {
   const data = response.data.reservas;
 
   const ul = document.getElementById("lista-reservas");
+  const resumo = document.getElementById("resumo-hoje");
   ul.innerHTML = "";
 
   if (!data || data.length === 0) {
     ul.innerHTML = "<div class='list-empty'>Sem marcações para hoje.</div>";
+    resumo.textContent = "Hoje: sem marcações.";
     return;
   }
 
+  const agora = new Date().toTimeString().slice(0, 5);
+  const proxima = data.find(r => r.hora.slice(0, 5) >= agora);
+
+  resumo.innerHTML = proxima
+    ? `Hoje: <strong>${data.length}</strong> marcação(ões) · Próxima às <strong>${proxima.hora.slice(0, 5)}</strong>`
+    : `Hoje: <strong>${data.length}</strong> marcação(ões) · Todas já passaram`;
+
   data.forEach(r => {
     const div = document.createElement("div");
-    div.className = "list-item";
+    div.className = "reserva-item";
     div.innerHTML = `
-      <strong>${r.hora}</strong>
-      <span>${r.cliente_nome} · ${r.cliente_telemovel}</span>
+      <span class="hora-badge">${r.hora.slice(0, 5)}</span>
+      <div class="reserva-info">
+        <strong>${r.cliente_nome}</strong>
+        <a href="tel:${r.cliente_telemovel}">📞 ${r.cliente_telemovel}</a>
+      </div>
     `;
     ul.appendChild(div);
   });
@@ -262,9 +280,15 @@ async function apagarGrupoPausas(ids) {
 /* ---------------- ADICIONAR ---------------- */
 
 document.getElementById("btn-add-ferias").addEventListener("click", async () => {
-  const inicio = document.getElementById("ferias-inicio").value;
-  const fim = document.getElementById("ferias-fim").value;
-  if (!inicio || !fim) return;
+  const datas = feriasPicker.selectedDates;
+
+  if (datas.length < 2) {
+    alert("Escolhe o dia de início e o dia de fim das férias.");
+    return;
+  }
+
+  const inicio = feriasPicker.formatDate(datas[0], "Y-m-d");
+  const fim = feriasPicker.formatDate(datas[1], "Y-m-d");
 
   const mutation = `
     mutation AddFerias($obj: ferias_insert_input!) {
@@ -286,24 +310,24 @@ document.getElementById("btn-add-ferias").addEventListener("click", async () => 
     return;
   }
 
+  feriasPicker.clear();
   await carregarFerias();
   await carregarFeriasRanges();
   if (manualPicker) manualPicker.redraw();
 });
 
 document.getElementById("btn-add-pausa").addEventListener("click", async () => {
-  const dataInicio = document.getElementById("pausa-data").value;
-  const dataFim = document.getElementById("pausa-data-fim").value;
+  const datas = pausaPicker.selectedDates;
   const horaInicio = document.getElementById("pausa-inicio").value;
   const horaFim = document.getElementById("pausa-fim").value;
 
-  if (!dataInicio || !dataFim || !horaInicio || !horaFim) {
-    alert("Preenche todos os campos.");
+  if (datas.length < 2) {
+    alert("Escolhe o dia de início e o dia de fim da pausa.");
     return;
   }
 
-  if (dataFim < dataInicio) {
-    alert("A data de fim não pode ser anterior à data de início.");
+  if (!horaInicio || !horaFim) {
+    alert("Preenche as horas de início e fim.");
     return;
   }
 
@@ -311,6 +335,9 @@ document.getElementById("btn-add-pausa").addEventListener("click", async () => {
     alert("A hora de fim deve ser posterior à hora de início.");
     return;
   }
+
+  const dataInicio = pausaPicker.formatDate(datas[0], "Y-m-d");
+  const dataFim = pausaPicker.formatDate(datas[1], "Y-m-d");
 
   const pausas = [];
   const inicio = new Date(dataInicio);
@@ -341,8 +368,7 @@ document.getElementById("btn-add-pausa").addEventListener("click", async () => {
     return;
   }
 
-  document.getElementById("pausa-data").value = "";
-  document.getElementById("pausa-data-fim").value = "";
+  pausaPicker.clear();
   document.getElementById("pausa-inicio").value = "";
   document.getElementById("pausa-fim").value = "";
 
@@ -585,6 +611,59 @@ function iniciarFlatpickrManual() {
   });
 }
 
+/* ---------------- FLATPICKR (FÉRIAS - INTERVALO) ---------------- */
+
+let feriasPicker = null;
+
+function iniciarFlatpickrFerias() {
+  feriasPicker = flatpickr("#ferias-range", {
+    mode: "range",
+    dateFormat: "Y-m-d",
+    minDate: "today"
+  });
+}
+
+/* ---------------- FLATPICKR (PAUSAS - INTERVALO) ---------------- */
+/* ---------------- FLATPICKR (PAUSAS - INTERVALO + HORAS) ---------------- */
+let pausaPicker = null;
+
+function iniciarFlatpickrPausa() {
+  pausaPicker = flatpickr("#pausa-range", {
+    mode: "range",
+    dateFormat: "Y-m-d",
+    minDate: "today",
+    disable: [
+      d => d.getDay() === 0
+    ],
+    onDayCreate: function (dObj, dStr, fp, dayElem) {
+      if (dayElem.classList.contains("flatpickr-disabled")) {
+        dayElem.addEventListener("click", () => {
+          mostrarMensagem("Domingo está encerrado.");
+        });
+      }
+    }
+  });
+
+  flatpickr("#pausa-inicio", {
+    enableTime: true,
+    noCalendar: true,
+    dateFormat: "H:i",
+    time_24hr: true,
+    minuteIncrement: 30,
+    minTime: "08:00",
+    maxTime: "19:00"
+  });
+
+  flatpickr("#pausa-fim", {
+    enableTime: true,
+    noCalendar: true,
+    dateFormat: "H:i",
+    time_24hr: true,
+    minuteIncrement: 30,
+    minTime: "08:00",
+    maxTime: "19:00"
+  });
+}
 /* ---------------- REGISTAR MARCAÇÃO MANUAL (TELEFONE) ---------------- */
 
 document.getElementById("btn-add-manual").addEventListener("click", async () => {
@@ -754,6 +833,89 @@ document.getElementById("logout-btn").addEventListener("click", () => {
   window.location.href = "login.html";
 });
 
+/* ---------------- ALTERAR DADOS DE ACESSO (CONTA) ---------------- */
+
+document.getElementById("btn-guardar-conta").addEventListener("click", async () => {
+  const passwordAtual = document.getElementById("conta-password-atual").value;
+  const novoUsername = document.getElementById("conta-novo-username").value.trim();
+  const novaPassword = document.getElementById("conta-nova-password").value;
+  const confirmarPassword = document.getElementById("conta-confirmar-password").value;
+
+  if (!passwordAtual) {
+    alert("Introduz a tua password atual para confirmar a alteração.");
+    return;
+  }
+
+  if (!novoUsername && !novaPassword) {
+    alert("Preenche o novo username e/ou a nova password.");
+    return;
+  }
+
+  if (novaPassword && novaPassword !== confirmarPassword) {
+    alert("As passwords não coincidem.");
+    return;
+  }
+
+  // Construir o objeto só com os campos que o barbeiro quer mesmo alterar
+  const alteracoes = {};
+  if (novoUsername) alteracoes.username = novoUsername;
+  if (novaPassword) alteracoes.password = novaPassword;
+
+  const mutation = `
+    mutation AlterarConta($id: uuid!, $passwordAtual: String!, $obj: barbeiros_set_input!) {
+      update_barbeiros(
+        where: {
+          id: { _eq: $id },
+          password: { _eq: $passwordAtual }
+        },
+        _set: $obj
+      ) {
+        affected_rows
+      }
+    }
+  `;
+
+  const response = await nhost.graphql.request(mutation, {
+    id: barbeiroId,
+    passwordAtual,
+    obj: alteracoes
+  });
+
+  if (response.error) {
+    console.error("Erro ao alterar conta:", response.error);
+    alert("Erro ao guardar alterações.");
+    return;
+  }
+
+  const affected = response.data?.update_barbeiros?.affected_rows || 0;
+
+  if (affected === 0) {
+    alert("Password atual incorreta. Nenhuma alteração foi feita.");
+    return;
+  }
+
+  alert("Dados atualizados com sucesso! Vais ter de fazer login novamente.");
+
+  // Como o username pode ter mudado, força novo login por segurança
+  localStorage.removeItem("barbeiro");
+  window.location.href = "login.html";
+});
+
+/* ---------------- MOSTRAR/OCULTAR PASSWORD ---------------- */
+
+document.querySelectorAll(".toggle-password").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const input = document.getElementById(btn.dataset.target);
+    if (input.type === "password") {
+      input.type = "text";
+      btn.textContent = "🙈";
+    } else {
+      input.type = "password";
+      btn.textContent = "👁️";
+    }
+  });
+});
+
 /* ---------------- INICIAR ---------------- */
 
 checkSession();
@@ -762,53 +924,102 @@ checkSession();
 
 window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-historico").addEventListener("click", () => {
-    document.getElementById("historico-mes").style.display = "block";
+    const filtros = document.getElementById("historico-filtros");
+    filtros.style.display = filtros.style.display === "none" ? "block" : "none";
+  });
+
+  document.getElementById("historico-dia").addEventListener("change", async (e) => {
+    if (!e.target.value) return;
+    document.getElementById("historico-mes").value = "";
+    await carregarHistorico(e.target.value, e.target.value, true);
   });
 
   document.getElementById("historico-mes").addEventListener("change", async (e) => {
+    if (!e.target.value) return;
+    document.getElementById("historico-dia").value = "";
+
     const mes = e.target.value;
+    const inicio = mes + "-01";
+    const [ano, mesNum] = mes.split("-");
+    const ultimoDia = new Date(Number(ano), Number(mesNum), 0).getDate();
+    const fim = `${mes}-${String(ultimoDia).padStart(2, "0")}`;
 
-    const query = `
-      query Historico($id: uuid!, $inicio: date!, $fim: date!) {
-        reservas(where: {
-          barbeiro_id: { _eq: $id },
-          data: { _gte: $inicio, _lte: $fim }
-        }, order_by: [{ data: asc }, { hora: asc }]) {
-          data
-          hora
-          cliente_nome
-          cliente_telemovel
-        }
-      }
-    `;
-
-    const response = await nhost.graphql.request(query, {
-      id: barbeiroId,
-      inicio: mes + "-01",
-      fim: mes + "-31"
-    });
-
-    const data = response.data.reservas;
-
-    const ul = document.getElementById("lista-reservas");
-    ul.innerHTML = "";
-
-    if (!data || data.length === 0) {
-      ul.innerHTML = "<div class='list-empty'>Sem reservas neste mês.</div>";
-      return;
-    }
-
-    data.forEach(r => {
-      const div = document.createElement("div");
-      div.className = "list-item";
-      div.innerHTML = `
-        <strong>${r.data} · ${r.hora}</strong>
-        <span>${r.cliente_nome} · ${r.cliente_telemovel}</span>
-      `;
-      ul.appendChild(div);
-    });
+    await carregarHistorico(inicio, fim, false);
   });
 });
+
+async function carregarHistorico(inicio, fim, mostrarApenasHora) {
+  const query = `
+    query Historico($id: uuid!, $inicio: date!, $fim: date!) {
+      reservas(where: {
+        barbeiro_id: { _eq: $id },
+        data: { _gte: $inicio, _lte: $fim }
+      }, order_by: [{ data: asc }, { hora: asc }]) {
+        id
+        data
+        hora
+        cliente_nome
+        cliente_telemovel
+      }
+    }
+  `;
+
+  const response = await nhost.graphql.request(query, {
+    id: barbeiroId,
+    inicio,
+    fim
+  });
+
+  const data = response.data.reservas;
+
+  const ul = document.getElementById("lista-reservas");
+  ul.innerHTML = "";
+
+  if (!data || data.length === 0) {
+    ul.innerHTML = "<div class='list-empty'>Sem reservas neste período.</div>";
+    return;
+  }
+
+  data.forEach(r => {
+    const div = document.createElement("div");
+    div.className = "reserva-item";
+
+    const rotuloHora = mostrarApenasHora
+      ? r.hora.slice(0, 5)
+      : `${r.data} · ${r.hora.slice(0, 5)}`;
+
+    div.innerHTML = `
+      <span class="hora-badge">${rotuloHora}</span>
+      <div class="reserva-info">
+        <strong>${r.cliente_nome}</strong>
+        <a href="tel:${r.cliente_telemovel}">📞 ${r.cliente_telemovel}</a>
+      </div>
+      <button class="btn-delete-reserva" onclick="apagarReservaHistorico('${r.id}', '${inicio}', '${fim}', ${mostrarApenasHora})">✖</button>
+    `;
+    ul.appendChild(div);
+  });
+}
+
+async function apagarReservaHistorico(id, inicio, fim, mostrarApenasHora) {
+  if (!confirm("Apagar esta reserva? Esta ação não pode ser desfeita.")) return;
+
+  const mutation = `
+    mutation DeleteReserva($id: uuid!) {
+      delete_reservas_by_pk(id: $id) { id }
+    }
+  `;
+
+  const response = await nhost.graphql.request(mutation, { id });
+
+  if (response.error) {
+    console.error("Erro ao apagar reserva:", response.error);
+    alert("Erro ao apagar reserva.");
+    return;
+  }
+
+  mostrarMensagem("Reserva apagada com sucesso");
+  await carregarHistorico(inicio, fim, mostrarApenasHora);
+}
 
 /* ---------------- EXPOR FUNÇÕES PARA O HTML (onclick) ---------------- */
 
@@ -817,6 +1028,7 @@ window.fecharModal = fecharModal;
 window.apagarFerias = apagarFerias;
 window.apagarPausa = apagarPausa;
 window.apagarGrupoPausas = apagarGrupoPausas;
+window.apagarReservaHistorico = apagarReservaHistorico;
 
 /* ---------------- TIMEOUT DE INATIVIDADE ---------------- */
 
