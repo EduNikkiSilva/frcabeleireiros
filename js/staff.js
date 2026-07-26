@@ -56,6 +56,8 @@ async function checkSession() {
   await carregarReservas();
   await carregarFerias();
   await carregarPausas();
+  await carregarFeriasRanges();
+  iniciarFlatpickrManual();
 }
 
 /* ---------------- CARREGAR DADOS ---------------- */
@@ -181,7 +183,6 @@ async function carregarPausas() {
     return;
   }
 
-  // Agrupar dias consecutivos com a mesma hora_inicio/hora_fim
   const grupos = [];
   let grupoAtual = null;
 
@@ -286,6 +287,8 @@ document.getElementById("btn-add-ferias").addEventListener("click", async () => 
   }
 
   await carregarFerias();
+  await carregarFeriasRanges();
+  if (manualPicker) manualPicker.redraw();
 });
 
 document.getElementById("btn-add-pausa").addEventListener("click", async () => {
@@ -309,7 +312,6 @@ document.getElementById("btn-add-pausa").addEventListener("click", async () => {
     return;
   }
 
-  // Gerar uma pausa para cada dia do intervalo
   const pausas = [];
   const inicio = new Date(dataInicio);
   const fim = new Date(dataFim);
@@ -347,6 +349,291 @@ document.getElementById("btn-add-pausa").addEventListener("click", async () => {
   await carregarPausas();
 });
 
+/* ---------------- CÁLCULO DE FERIADOS (fixos + móveis + municipal) ---------------- */
+
+function calcularPascoa(ano) {
+  const a = ano % 19;
+  const b = Math.floor(ano / 100);
+  const c = ano % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const mes = Math.floor((h + l - 7 * m + 114) / 31);
+  const dia = ((h + l - 7 * m + 114) % 31) + 1;
+
+  return new Date(ano, mes - 1, dia);
+}
+
+function formatarData(date) {
+  return date.toISOString().split("T")[0];
+}
+
+function adicionarDias(date, dias) {
+  const nova = new Date(date);
+  nova.setDate(nova.getDate() + dias);
+  return nova;
+}
+
+function gerarFeriados(ano) {
+  const pascoa = calcularPascoa(ano);
+
+  return [
+    // Fixos nacionais obrigatórios
+    `${ano}-01-01`, // Ano Novo
+    `${ano}-04-25`, // Dia da Liberdade
+    `${ano}-05-01`, // Dia do Trabalhador
+    `${ano}-06-10`, // Dia de Portugal
+    `${ano}-08-15`, // Assunção de Nossa Senhora
+    `${ano}-10-05`, // Implantação da República
+    `${ano}-11-01`, // Todos os Santos
+    `${ano}-12-01`, // Restauração da Independência
+    `${ano}-12-08`, // Imaculada Conceição
+    `${ano}-12-25`, // Natal
+
+    // Móveis nacionais obrigatórios (baseados na Páscoa)
+    formatarData(adicionarDias(pascoa, -2)), // Sexta-feira Santa
+    formatarData(pascoa),                     // Domingo de Páscoa
+    formatarData(adicionarDias(pascoa, 60)), // Corpo de Deus
+
+    // Municipal - Castelo Branco (Nossa Senhora de Mércoles)
+    // Segunda terça-feira depois da Páscoa = Páscoa + 16 dias
+    formatarData(adicionarDias(pascoa, 16))
+  ];
+}
+
+const feriados = [
+  ...gerarFeriados(new Date().getFullYear()),
+  ...gerarFeriados(new Date().getFullYear() + 1)
+];
+
+/* ---------------- FÉRIAS DO BARBEIRO (para bloquear no calendário) ---------------- */
+
+let feriasRanges = [];
+
+async function carregarFeriasRanges() {
+  const query = `
+    query FeriasRanges($id: uuid!) {
+      ferias(where: { barbeiro_id: { _eq: $id } }) {
+        data_inicio
+        data_fim
+      }
+    }
+  `;
+
+  const response = await nhost.graphql.request(query, { id: barbeiroId });
+  const data = response.data?.ferias || [];
+
+  feriasRanges = data.map(f => ({
+    inicio: new Date(f.data_inicio + "T00:00:00"),
+    fim: new Date(f.data_fim + "T00:00:00")
+  }));
+}
+
+function estaEmFerias(date) {
+  return feriasRanges.some(r => date >= r.inicio && date <= r.fim);
+}
+
+/* ---------------- GERAR HORAS DISPONÍVEIS (MARCAÇÃO MANUAL) ---------------- */
+
+function gerarHorarioBase(diaSemana) {
+  const horas = [];
+  let inicio, fim;
+
+  if (diaSemana >= 1 && diaSemana <= 5) {
+    inicio = 9;
+    fim = 19;
+  } else if (diaSemana === 6) {
+    inicio = 8;
+    fim = 18;
+  } else {
+    return [];
+  }
+
+  for (let h = inicio; h <= fim; h++) {
+    horas.push(`${String(h).padStart(2, "0")}:00`);
+    if (h !== fim) horas.push(`${String(h).padStart(2, "0")}:30`);
+  }
+
+  return horas;
+}
+
+async function verificarPausasManual(dataSelecionada) {
+  const query = `
+    query PausasManual($id: uuid!, $data: date!) {
+      pausas(where: {
+        barbeiro_id: { _eq: $id },
+        data: { _eq: $data }
+      }) {
+        hora_inicio
+        hora_fim
+      }
+    }
+  `;
+
+  const response = await nhost.graphql.request(query, {
+    id: barbeiroId,
+    data: dataSelecionada
+  });
+
+  const pausas = response.data?.pausas;
+
+  return pausas?.map(p => ({
+    inicio: p.hora_inicio.substring(0, 5),
+    fim: p.hora_fim.substring(0, 5)
+  })) || [];
+}
+
+async function obterHorasReservadasManual(dataSelecionada) {
+  const query = `
+    query ReservasManual($id: uuid!, $data: date!) {
+      reservas(where: {
+        barbeiro_id: { _eq: $id },
+        data: { _eq: $data }
+      }) {
+        hora
+      }
+    }
+  `;
+
+  const response = await nhost.graphql.request(query, {
+    id: barbeiroId,
+    data: dataSelecionada
+  });
+
+  const reservas = response.data?.reservas;
+
+  return reservas?.map(r => r.hora.substring(0, 5)) || [];
+}
+
+async function gerarHorasManual(dataSelecionada) {
+  const select = document.getElementById("manual-hora");
+
+  if (!dataSelecionada) {
+    select.innerHTML = '<option value="">Escolhe a data primeiro</option>';
+    return;
+  }
+
+  const diaSemana = new Date(dataSelecionada + "T00:00:00").getDay();
+  const horasBase = gerarHorarioBase(diaSemana);
+
+  if (!horasBase.length) {
+    select.innerHTML = '<option value="">Domingo indisponível</option>';
+    return;
+  }
+
+  const pausas = await verificarPausasManual(dataSelecionada);
+  const horasReservadas = await obterHorasReservadasManual(dataSelecionada);
+
+  const horasDisponiveis = horasBase.filter(hora => {
+    if (horasReservadas.includes(hora)) return false;
+    const emPausa = pausas.some(p => hora >= p.inicio && hora < p.fim);
+    if (emPausa) return false;
+    return true;
+  });
+
+  if (!horasDisponiveis.length) {
+    select.innerHTML = '<option value="">Sem horários disponíveis</option>';
+    return;
+  }
+
+  select.innerHTML = '<option value="">Escolhe a hora</option>';
+  horasDisponiveis.forEach(h => {
+    const opt = document.createElement("option");
+    opt.value = h;
+    opt.textContent = h;
+    select.appendChild(opt);
+  });
+}
+
+/* ---------------- FLATPICKR (MARCAÇÃO MANUAL) ---------------- */
+
+let manualPicker = null;
+
+function iniciarFlatpickrManual() {
+  manualPicker = flatpickr("#manual-data", {
+    dateFormat: "Y-m-d",
+    minDate: "today",
+    disable: [
+      d => d.getDay() === 0,
+      d => estaEmFerias(d),
+      ...feriados
+    ],
+    onChange: function (selectedDates, dateStr) {
+      gerarHorasManual(dateStr);
+    },
+    onDayCreate: function (dObj, dStr, fp, dayElem) {
+      if (dayElem.classList.contains("flatpickr-disabled")) {
+        dayElem.addEventListener("click", () => {
+          const dia = dayElem.dateObj;
+
+          if (dia.getDay() === 0) {
+            mostrarMensagem("Domingo está encerrado.");
+          } else if (estaEmFerias(dia)) {
+            mostrarMensagem("Estás de férias nesta data.");
+          } else {
+            mostrarMensagem("Feriado - indisponível.");
+          }
+        });
+      }
+    }
+  });
+}
+
+/* ---------------- REGISTAR MARCAÇÃO MANUAL (TELEFONE) ---------------- */
+
+document.getElementById("btn-add-manual").addEventListener("click", async () => {
+  const data = document.getElementById("manual-data").value;
+  const hora = document.getElementById("manual-hora").value;
+  const servico = document.getElementById("manual-servico").value;
+  const cliente_nome = document.getElementById("manual-nome").value.trim();
+  const cliente_telemovel = document.getElementById("manual-telemovel").value.trim();
+
+  if (!data || !hora || !servico || !cliente_nome || !cliente_telemovel) {
+    alert("Preenche todos os campos.");
+    return;
+  }
+
+  const mutation = `
+    mutation CriarReservaManual($obj: reservas_insert_input!) {
+      insert_reservas_one(object: $obj) {
+        id
+      }
+    }
+  `;
+
+  const response = await nhost.graphql.request(mutation, {
+    obj: {
+      barbeiro_id: barbeiroId,
+      data,
+      hora,
+      servico,
+      cliente_nome,
+      cliente_telemovel
+    }
+  });
+
+  if (response.error) {
+    console.error("Erro ao registar marcação manual:", response.error);
+    alert("Erro ao registar marcação.");
+    return;
+  }
+
+  alert("Marcação registada com sucesso!");
+
+  document.getElementById("manual-data").value = "";
+  document.getElementById("manual-hora").innerHTML = '<option value="">Escolhe a data primeiro</option>';
+  document.getElementById("manual-nome").value = "";
+  document.getElementById("manual-telemovel").value = "";
+
+  await carregarReservas();
+});
+
 /* ---------------- APAGAR ---------------- */
 
 async function apagarFerias(id) {
@@ -356,8 +643,17 @@ async function apagarFerias(id) {
     }
   `;
 
-  await nhost.graphql.request(mutation, { id });
+  const response = await nhost.graphql.request(mutation, { id });
+
+  if (response.error) {
+    console.error("Erro ao apagar férias:", response.error);
+    alert("Erro ao apagar férias.");
+    return;
+  }
+
   await carregarFerias();
+  await carregarFeriasRanges();
+  if (manualPicker) manualPicker.redraw();
 }
 
 async function apagarPausa(id) {
@@ -367,7 +663,14 @@ async function apagarPausa(id) {
     }
   `;
 
-  await nhost.graphql.request(mutation, { id });
+  const response = await nhost.graphql.request(mutation, { id });
+
+  if (response.error) {
+    console.error("Erro ao apagar pausa:", response.error);
+    alert("Erro ao apagar pausa.");
+    return;
+  }
+
   await carregarPausas();
 }
 
@@ -391,6 +694,8 @@ document.getElementById("modal-save").addEventListener("click", async () => {
     });
 
     await carregarFerias();
+    await carregarFeriasRanges();
+    if (manualPicker) manualPicker.redraw();
     mostrarMensagem("Férias atualizadas com sucesso");
   }
 
@@ -460,7 +765,7 @@ window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("historico-mes").style.display = "block";
   });
 
-    document.getElementById("historico-mes").addEventListener("change", async (e) => {
+  document.getElementById("historico-mes").addEventListener("change", async (e) => {
     const mes = e.target.value;
 
     const query = `
@@ -511,6 +816,7 @@ window.abrirModal = abrirModal;
 window.fecharModal = fecharModal;
 window.apagarFerias = apagarFerias;
 window.apagarPausa = apagarPausa;
+window.apagarGrupoPausas = apagarGrupoPausas;
 
 /* ---------------- TIMEOUT DE INATIVIDADE ---------------- */
 

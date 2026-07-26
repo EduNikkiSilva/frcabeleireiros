@@ -45,29 +45,33 @@ body {
 header {
   width: 100%;
   background: linear-gradient(135deg, var(--primary), var(--primary-light));
-  padding: 2rem 3rem;
+  padding: 1rem 3rem;
+  box-shadow: var(--shadow);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.header-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: var(--shadow);
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  gap: 1.5rem;
 }
 
 header .logo-area {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 header .logo-area img {
-  height: 110px;
+  height: 55px;
   width: auto;
-  border-radius: 14px;
+  border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.25);
 }
 
 header strong {
-  font-size: 1.6rem;
+  font-size: 1.2rem;
   color: white;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -77,10 +81,10 @@ header strong {
   background: var(--accent);
   color: #111;
   border: none;
-  padding: 0.7rem 1.4rem;
+  padding: 0.6rem 1.2rem;
   border-radius: 10px;
   cursor: pointer;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
   transition: 0.25s ease;
   box-shadow: var(--shadow-soft);
@@ -366,4 +370,70 @@ header strong {
 
 .btn-cancel:hover {
   background: #6b7280 !important;
+}
+
+/* =========================================================
+   NAVEGAÇÃO POR ABAS (dentro do header)
+========================================================= */
+.tabs-nav {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: right;
+  flex: 1;
+}
+
+.tab-btn {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 0.55rem 1.1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.75);
+  transition: 0.25s ease;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  background: rgba(255,255,255,0.15);
+  color: white;
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: #111;
+  box-shadow: var(--shadow-soft);
+  border-color: transparent;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+  animation: fadeInTab 0.3s ease;
+}
+
+@keyframes fadeInTab {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card-full {
+  max-width: 700px;
+  margin: 2rem auto 0;
+}
+
+@media (max-width: 900px) {
+  .header-top {
+    flex-wrap: wrap;
+  }
+  .tabs-nav {
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
+  }
 }

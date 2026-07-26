@@ -5,6 +5,10 @@
   <title>Painel Staff - FR Cabeleireiros</title>
   <link rel="icon" type="image/png" href="img/fr.ico">
 
+  <!-- FLATPICKR -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
   <!-- CSS -->
   <link rel="stylesheet" href="css/dashboard.css">
 
@@ -15,38 +19,72 @@
 <body>
 
 <header>
-  <div class="logo-area">
-    <a href="#" onclick="location.reload(); return false;">
-      <img src="img/fr.png" class="logo">
-    </a>
-    <strong>FR Cabeleireiros · Painel de Colaborador</strong>
+  <div class="header-top">
+    <div class="logo-area">
+      <a href="#" onclick="location.reload(); return false;">
+        <img src="img/fr.png" class="logo">
+      </a>
+      <strong>FR Cabeleireiros · Painel de Colaborador</strong>
+    </div>
+
+    <div class="tabs-nav">
+      <button class="tab-btn active" data-tab="tab-marcacoes">📅 Marcações</button>
+      <button class="tab-btn" data-tab="tab-ferias">🏖️ Férias</button>
+      <button class="tab-btn" data-tab="tab-pausas">☕ Pausas</button>
+      <button class="tab-btn" data-tab="tab-conta">⚙️ A minha conta</button>
+    </div>
+
+    <button id="logout-btn">Sair</button>
   </div>
-  <button id="logout-btn">Sair</button>
 </header>
 
 <div class="wrapper">
 
   <div id="bemvindo"></div>
 
-  <div class="cards-grid">
+  <!-- ABA: MARCAÇÕES -->
+<section class="tab-content active" id="tab-marcacoes">
+  <section class="card card-full">
+    <h2>As minhas marcações</h2>
 
-    <!-- CARD 1: MARCAÇÕES -->
-    <section class="card">
-      <h2>As minhas marcações</h2>
+    <div class="list" id="lista-reservas">
+      <div class="list-empty">Sem marcações.</div>
+    </div>
 
-      <div class="list" id="lista-reservas">
-        <div class="list-empty">Sem marcações.</div>
-      </div>
-      
-      <button id="btn-historico" class="btn-secondary" style="margin-top:1rem;">
-        📅 Ver histórico
-      </button>
-      
-      <input type="month" id="historico-mes" class="input-modern" style="display:none; margin-top:0.7rem;">
-    </section>
+    <button id="btn-historico" class="btn-secondary" style="margin-top:1rem;">
+      📅 Ver histórico
+    </button>
 
-    <!-- CARD 2: FÉRIAS -->
-    <section class="card">
+    <input type="month" id="historico-mes" class="input-modern" style="display:none; margin-top:0.7rem;">
+
+    <h3 class="subtitle" style="margin-top:1.8rem;">Registar marcação manual (telefone)</h3>
+
+    <label>Data</label>
+    <input type="text" id="manual-data" class="input-modern" placeholder="Escolhe a data" />
+
+    <label>Hora</label>
+    <select id="manual-hora" class="input-modern">
+      <option value="">Escolhe a data primeiro</option>
+    </select>
+
+    <label>Serviço</label>
+    <select id="manual-servico" class="input-modern">
+      <option value="corte e lavagem">Corte e Lavagem</option>
+    </select>
+
+    <label>Nome do cliente</label>
+    <input type="text" id="manual-nome" class="input-modern" placeholder="Nome" />
+
+    <label>Telemóvel do cliente</label>
+    <input type="tel" id="manual-telemovel" class="input-modern" placeholder="9XXXXXXXX" />
+
+    <button id="btn-add-manual" class="btn-primary">➕ Registar marcação</button>
+  </section>
+</section>
+
+  <!-- ABA: FÉRIAS -->
+  <section class="tab-content" id="tab-ferias">
+    <section class="card card-full">
       <h2>Férias</h2>
 
       <div class="list" id="lista-ferias">
@@ -60,9 +98,11 @@
 
       <button id="btn-add-ferias" class="btn-primary">➕ Guardar férias</button>
     </section>
+  </section>
 
-    <!-- CARD 3: PAUSAS -->
-    <section class="card">
+  <!-- ABA: PAUSAS -->
+  <section class="tab-content" id="tab-pausas">
+    <section class="card card-full">
       <h2>Pausas / Almoço</h2>
 
       <div class="list" id="lista-pausas">
@@ -85,8 +125,16 @@
 
       <button id="btn-add-pausa" class="btn-primary">➕ Guardar pausa</button>
     </section>
+  </section>
 
-  </div>
+  <!-- ABA: CONTA (por implementar na Fase 3) -->
+  <section class="tab-content" id="tab-conta">
+    <section class="card card-full">
+      <h2>A minha conta</h2>
+      <p class="list-empty">Em breve: alterar username e password.</p>
+    </section>
+  </section>
+
 </div>
 
 <!-- MODAL -->
@@ -106,6 +154,19 @@
 
 <!-- JS -->
 <script type="module" src="js/staff.js"></script>
+
+<!-- NAVEGAÇÃO ENTRE ABAS -->
+<script>
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+
+      btn.classList.add("active");
+      document.getElementById(btn.dataset.tab).classList.add("active");
+    });
+  });
+</script>
 
 </body>
 </html>

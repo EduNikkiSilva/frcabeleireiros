@@ -170,7 +170,7 @@ async function gerarHoras(diaSemana, barbeiroId, dataSelecionada) {
   let horasDisponiveis = horasBase.filter(hora => {
     if (horasReservadas.includes(hora)) return false;
 
-    const emPausa = pausas.some(p => hora >= p.inicio && hora <= p.fim);
+    const emPausa = pausas.some(p => hora >= p.inicio && hora < p.fim);
     if (emPausa) return false;
 
     return true;
