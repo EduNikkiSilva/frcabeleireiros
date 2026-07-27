@@ -42,7 +42,7 @@
     <div class="hero-carrossel">
       <img src="img/slide1.jpg" class="hero-slide active" alt="">
       <img src="img/slide2.jpg" class="hero-slide" alt="">
-      <img src="img/slide3.jpg" class="hero-slide" alt="">
+      <img src="img/slide3.webp" class="hero-slide" alt="">
       <img src="img/slide4.jpg" class="hero-slide" alt="">
     </div>
     <div class="hero-overlay"></div>
@@ -60,7 +60,24 @@
   <div class="pagina-simples">
     <h2>A nossa história</h2>
     <p class="placeholder-aviso">📝 Conteúdo em breve — a história da FR Cabeleireiros vai ser adicionada aqui.</p>
+
+    <section class="map-card-section" style="margin-top:2rem;">
+      <h2>Onde estamos</h2>
+
+      <div class="map-wrapper">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1885.4007287702202!2d-7.5044570011774745!3d39.81765977832241!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd3d5ea1d1367c61%3A0xb8ce64fd21ff2a9!2sFR%20Cabeleireiros!5e1!3m2!1spt-PT!2spt!4v1780603208853!5m2!1spt-PT!2spt"
+          style="border:0;"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+
+      <p class="map-caption">📍 Visita‑nos aqui</p>
+    </section>
   </div>
+  <footer class="site-footer">FR Cabeleireiros © 2026</footer>
 </section>
 
 <!-- ABA: EQUIPA -->
@@ -82,13 +99,12 @@
       </div>
     </div>
   </div>
+  <footer class="site-footer">FR Cabeleireiros © 2026</footer>
 </section>
 
 <!-- ABA: MARCAÇÕES -->
 <section class="site-tab-content" id="tab-marcacoes">
-  <div class="layout">
-
-    <!-- FORMULÁRIO À ESQUERDA -->
+  <div class="layout-centrado">
     <section id="reserva" class="form-section">
       <h2>Fazer marcação</h2>
 
@@ -124,42 +140,8 @@
         <button type="submit" class="btn-reserva">Confirmar marcação</button>
       </form>
     </section>
-
-    <!-- COLUNA DIREITA -->
-    <div class="right-column">
-
-      <div class="team-title">A equipa da FR Cabeleireiros</div>
-
-      <div class="barbers-grid">
-        <div class="barber-card">
-          <img src="img/francisco.jpg" alt="Francisco Rodrigues">
-          <h3>Francisco Rodrigues</h3>
-        </div>
-
-        <div class="barber-card">
-          <img src="img/ricardo2.jpg" alt="Ricardo Pires">
-          <h3>Ricardo Pires</h3>
-        </div>
-      </div>
-
-      <section class="map-card-section">
-        <h2>Onde estamos</h2>
-
-        <div class="map-wrapper">
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1885.4007287702202!2d-7.5044570011774745!3d39.81765977832241!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd3d5ea1d1367c61%3A0xb8ce64fd21ff2a9!2sFR%20Cabeleireiros!5e1!3m2!1spt-PT!2spt!4v1780603208853!5m2!1spt-PT!2spt"
-            style="border:0;"
-            allowfullscreen=""
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade">
-          </iframe>
-        </div>
-
-        <p class="map-caption">📍 Visita‑nos aqui</p>
-      </section>
-
-    </div>
   </div>
+  <footer class="site-footer">FR Cabeleireiros © 2026</footer>
 </section>
 
 <!-- ABA: PRODUTOS -->
@@ -206,6 +188,7 @@
       </div>
     </div>
   </div>
+  <footer class="site-footer">FR Cabeleireiros © 2026</footer>
 </section>
 
 <div id="popup">Reserva confirmada!</div>
@@ -224,8 +207,6 @@
     heroSlides[heroIndex].classList.add("active");
   }, 4000);
 </script>
-
-
 
 <script>
   /* NAVEGAÇÃO ENTRE ABAS DO SITE */
