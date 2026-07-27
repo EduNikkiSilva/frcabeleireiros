@@ -424,7 +424,6 @@ select:focus {
   color: var(--accent);
 }
 
-/* Desktop: hover */
 @media (hover: hover) {
   .produto-card:hover img {
     filter: blur(3px) brightness(0.6);
@@ -434,7 +433,6 @@ select:focus {
   }
 }
 
-/* Mobile/touch: classe "touched" adicionada via JS */
 .produto-card.touched img {
   filter: blur(3px) brightness(0.6);
 }

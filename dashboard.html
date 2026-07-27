@@ -124,7 +124,7 @@
 
       <h3 class="subtitle">Adicionar férias</h3>
 
-      <label>Escolhe o período</label>
+      <label>Escolhe o período (clica no primeiro e no último dia)</label>
       <input type="text" id="ferias-range" class="input-modern" placeholder="Escolhe o intervalo de férias" />
 
       <button id="btn-add-ferias" class="btn-primary">➕ Guardar férias</button>
@@ -132,86 +132,87 @@
   </section>
 
   <!-- ABA: PAUSAS -->
-  <!-- ABA: PAUSAS -->
-<section class="tab-content" id="tab-pausas">
-  <div class="marcacoes-grid">
+  <section class="tab-content" id="tab-pausas">
+    <div class="marcacoes-grid">
 
-    <!-- COLUNA ESQUERDA: LISTA -->
-    <section class="card">
-      <h2>Pausas / Almoço</h2>
+      <!-- COLUNA ESQUERDA: LISTA -->
+      <section class="card">
+        <h2>Pausas / Almoço</h2>
 
-      <div class="list" id="lista-pausas">
-        <div class="list-empty">Sem pausas registadas.</div>
-      </div>
-    </section>
-
-    <!-- COLUNA DIREITA: FORMULÁRIO -->
-    <section class="card">
-      <h2>Adicionar pausa</h2>
-
-      <label>Escolhe o período (clica no primeiro e no último dia)</label>
-      <input type="text" id="pausa-range" class="input-modern" placeholder="Escolhe o intervalo de dias" />
-
-      <div class="form-row">
-        <div>
-          <label>Hora início</label>
-          <input type="text" id="pausa-inicio" class="input-modern" placeholder="Escolhe a hora" />
+        <div class="list" id="lista-pausas">
+          <div class="list-empty">Sem pausas registadas.</div>
         </div>
-        <div>
-          <label>Hora fim</label>
-          <input type="text" id="pausa-fim" class="input-modern" placeholder="Escolhe a hora" />
+      </section>
+
+      <!-- COLUNA DIREITA: FORMULÁRIO -->
+      <section class="card">
+        <h2>Adicionar pausa</h2>
+
+        <label>Escolhe o período (clica no primeiro e no último dia)</label>
+        <input type="text" id="pausa-range" class="input-modern" placeholder="Escolhe o intervalo de dias" />
+
+        <div class="form-row">
+          <div>
+            <label>Hora início</label>
+            <input type="text" id="pausa-inicio" class="input-modern" placeholder="Escolhe a hora" />
+          </div>
+          <div>
+            <label>Hora fim</label>
+            <input type="text" id="pausa-fim" class="input-modern" placeholder="Escolhe a hora" />
+          </div>
         </div>
-      </div>
 
-      <button id="btn-add-pausa" class="btn-primary">➕ Guardar pausa</button>
-    </section>
+        <button id="btn-add-pausa" class="btn-primary">➕ Guardar pausa</button>
+      </section>
 
-  </div>
-</section>
-
-<!-- ABA: CONTA -->
-<section class="tab-content" id="tab-conta">
-  <section class="card card-full">
-    <h2>A minha conta</h2>
-    <p class="conta-username">Sessão iniciada como <strong id="conta-username-atual">...</strong></p>
-
-    <div class="conta-secao">
-      <h3 class="subtitle">Confirmar identidade</h3>
-      <p class="form-hint">Introduz a tua password atual para poderes alterar os dados abaixo</p>
-
-      <label>Password atual</label>
-      <div class="password-wrapper">
-        <input type="password" id="conta-password-atual" class="input-modern" placeholder="Password atual" />
-        <button type="button" class="toggle-password" data-target="conta-password-atual">👁️</button>
-      </div>
     </div>
-
-    <div class="conta-divider"></div>
-
-    <div class="conta-secao">
-      <h3 class="subtitle">Novos dados (opcional)</h3>
-
-      <label>Novo username</label>
-      <input type="text" id="conta-novo-username" class="input-modern" placeholder="Deixa em branco para não alterar" />
-
-      <label>Nova password</label>
-      <div class="password-wrapper">
-        <input type="password" id="conta-nova-password" class="input-modern" placeholder="Deixa em branco para não alterar" />
-        <button type="button" class="toggle-password" data-target="conta-nova-password">👁️</button>
-      </div>
-
-      <label>Confirmar nova password</label>
-      <div class="password-wrapper">
-        <input type="password" id="conta-confirmar-password" class="input-modern" placeholder="Repete a nova password" />
-        <button type="button" class="toggle-password" data-target="conta-confirmar-password">👁️</button>
-      </div>
-    </div>
-
-    <p class="conta-aviso">🔒 Usa uma password que só tu conheces e não partilhes com ninguém.</p>
-
-    <button id="btn-guardar-conta" class="btn-primary">💾 Guardar alterações</button>
   </section>
-</section>
+
+  <!-- ABA: CONTA -->
+  <section class="tab-content" id="tab-conta">
+    <section class="card card-full">
+      <h2>A minha conta</h2>
+      <p class="conta-username">Sessão iniciada como <strong id="conta-username-atual">...</strong></p>
+
+      <div class="conta-secao">
+        <h3 class="subtitle">Confirmar identidade</h3>
+        <p class="form-hint">Introduz a tua password atual para poderes alterar os dados abaixo</p>
+
+        <label>Password atual</label>
+        <div class="password-wrapper">
+          <input type="password" id="conta-password-atual" class="input-modern" placeholder="Password atual" />
+          <button type="button" class="toggle-password" data-target="conta-password-atual">👁️</button>
+        </div>
+      </div>
+
+      <div class="conta-divider"></div>
+
+      <div class="conta-secao">
+        <h3 class="subtitle">Novos dados (opcional)</h3>
+
+        <label>Novo username</label>
+        <input type="text" id="conta-novo-username" class="input-modern" placeholder="Deixa em branco para não alterar" />
+
+        <label>Nova password</label>
+        <div class="password-wrapper">
+          <input type="password" id="conta-nova-password" class="input-modern" placeholder="Deixa em branco para não alterar" />
+          <button type="button" class="toggle-password" data-target="conta-nova-password">👁️</button>
+        </div>
+
+        <label>Confirmar nova password</label>
+        <div class="password-wrapper">
+          <input type="password" id="conta-confirmar-password" class="input-modern" placeholder="Repete a nova password" />
+          <button type="button" class="toggle-password" data-target="conta-confirmar-password">👁️</button>
+        </div>
+      </div>
+
+      <p class="conta-aviso">🔒 Usa uma password que só tu conheces e não partilhes com ninguém.</p>
+
+      <button id="btn-guardar-conta" class="btn-primary">💾 Guardar alterações</button>
+    </section>
+  </section>
+
+</div>
 
 <!-- MODAL -->
 <div id="modal-bg">
@@ -244,9 +245,5 @@
   });
 </script>
 
-<footer class="login-footer">
-    FR Cabeleireiros © 2026
-  </footer>
-  
 </body>
 </html>

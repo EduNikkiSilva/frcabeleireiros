@@ -78,8 +78,8 @@ header strong {
 }
 
 #logout-btn {
-  background: var(--accent);
-  color: #111;
+  background: #dc2626 !important;
+  color: white !important;
   border: none;
   padding: 0.6rem 1.2rem;
   border-radius: 10px;
@@ -91,7 +91,7 @@ header strong {
 }
 
 #logout-btn:hover {
-  background: var(--accent-dark);
+  background: #b91c1c !important;
   transform: translateY(-2px);
   box-shadow: 0 10px 25px rgba(0,0,0,0.25);
 }
@@ -110,21 +110,6 @@ header strong {
   font-weight: 700;
   margin-bottom: 2rem;
   color: var(--primary);
-}
-
-/* =========================================================
-   GRID DE CARDS
-========================================================= */
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.8rem;
-}
-
-@media (max-width: 1000px) {
-  .cards-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* =========================================================
@@ -383,7 +368,7 @@ header strong {
   display: flex;
   gap: 0.6rem;
   flex-wrap: wrap;
-  justify-content: right;
+  justify-content: center;
   flex: 1;
 }
 
@@ -443,7 +428,7 @@ header strong {
 }
 
 /* =========================================================
-   GRID DE 2 COLUNAS (MARCAÇÕES)
+   GRID DE 2 COLUNAS (MARCAÇÕES / PAUSAS)
 ========================================================= */
 .marcacoes-grid {
   display: grid;
@@ -547,18 +532,6 @@ header strong {
 }
 
 /* =========================================================
-   BOTÃO SAIR
-========================================================= */
-#logout-btn {
-  background: #dc2626 !important;
-  color: white !important;
-}
-
-#logout-btn:hover {
-  background: #b91c1c !important;
-}
-
-/* =========================================================
    ABA "A MINHA CONTA"
 ========================================================= */
 .conta-username {
@@ -612,14 +585,4 @@ header strong {
 
 .toggle-password:hover {
   opacity: 1;
-}
-
-/* =========================================================
-   RODAPÉ
-========================================================= */
-.login-footer {
-  padding: 1.5rem 0;
-  text-align: center;
-  font-size: 0.8rem;
-  color: var(--text-muted);
 }
