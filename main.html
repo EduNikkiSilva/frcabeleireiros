@@ -21,93 +21,215 @@
 
 <header>
   <div class="header-left">
-    <a href="main.html">
+    <a href="#" data-tab="tab-inicio" class="logo-link">
       <img src="img/fr.png" class="logo" alt="FR Cabeleireiros">
     </a>
     <h1>FR Cabeleireiros</h1>
   </div>
-  <button id="scroll-btn">Fazer reserva</button>
+
+  <nav class="site-tabs">
+    <button class="site-tab-btn active" data-tab="tab-inicio">🏠 Início</button>
+    <button class="site-tab-btn" data-tab="tab-historia">📖 História</button>
+    <button class="site-tab-btn" data-tab="tab-equipa">👥 Equipa</button>
+    <button class="site-tab-btn" data-tab="tab-marcacoes">✂️ Marcações</button>
+    <button class="site-tab-btn" data-tab="tab-produtos">🛒 Produtos</button>
+  </nav>
 </header>
 
-<div class="layout">
+<!-- ABA: INÍCIO -->
+<section class="site-tab-content active" id="tab-inicio">
+  <div class="hero">
+    <h2>Bem-vindo à FR Cabeleireiros</h2>
+    <p>Cortes, barba e cuidado ao teu estilo. Marca já a tua próxima visita.</p>
+    <button class="btn-hero" data-tab="tab-marcacoes">Fazer marcação</button>
+  </div>
+</section>
 
-  <!-- FORMULÁRIO À ESQUERDA -->
-  <section id="reserva" class="form-section">
-    <h2>Fazer marcação</h2>
+<!-- ABA: HISTÓRIA -->
+<section class="site-tab-content" id="tab-historia">
+  <div class="pagina-simples">
+    <h2>A nossa história</h2>
+    <p class="placeholder-aviso">📝 Conteúdo em breve — a história da FR Cabeleireiros vai ser adicionada aqui.</p>
+  </div>
+</section>
 
-    <form id="booking-form">
-      <label>Barbeiro</label>
-      <select name="barber" id="barber" required>
-        <option value="">Escolhe o barbeiro</option>
-        <option value="2703d3fa-b5b5-419a-94ba-00773fe80bb6">Francisco Rodrigues</option>
-        <option value="450143b2-8d3a-4af2-8905-1151d89e561c">Ricardo Pires</option>
-      </select>
-      <p id="ferias-info" style="color:#b91c1c; font-weight:600; margin-top:-5px;"></p>
+<!-- ABA: EQUIPA -->
+<section class="site-tab-content" id="tab-equipa">
+  <div class="pagina-simples">
+    <h2>A nossa equipa</h2>
 
-      <label>Serviço</label>
-      <select name="service" required>
-        <option value="">Escolhe o serviço</option>
-        <option value="corte e lavagem">Corte e Lavagem</option>
-      </select>
-
-      <label>Data</label>
-      <input type="text" name="date" id="date" required />
-
-      <label>Hora</label>
-      <select id="time" name="time" required>
-        <option value="">Escolhe a hora</option>
-      </select>
-
-      <label>Nome</label>
-      <input type="text" name="name" required />
-
-      <label>Telemóvel</label>
-      <input type="tel" name="phone" required />
-
-      <button type="submit" class="btn-reserva">Confirmar marcação</button>
-</form>
-  </section>
-
-  <!-- COLUNA DIREITA -->
-  <div class="right-column">
-
-    <div class="team-title">A equipa da FR Cabeleireiros</div>
-
-    <div class="barbers-grid">
-      <div class="barber-card">
+    <div class="equipa-grid">
+      <div class="equipa-card">
         <img src="img/francisco.jpg" alt="Francisco Rodrigues">
         <h3>Francisco Rodrigues</h3>
+        <p class="placeholder-aviso">📝 Biografia em breve.</p>
       </div>
 
-      <div class="barber-card">
+      <div class="equipa-card">
         <img src="img/ricardo2.jpg" alt="Ricardo Pires">
         <h3>Ricardo Pires</h3>
+        <p class="placeholder-aviso">📝 Biografia em breve.</p>
       </div>
     </div>
+  </div>
+</section>
 
-    <section class="map-card-section">
-      <h2>Onde estamos</h2>
+<!-- ABA: MARCAÇÕES -->
+<section class="site-tab-content" id="tab-marcacoes">
+  <div class="layout">
 
-      <div class="map-wrapper">
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1885.4007287702202!2d-7.5044570011774745!3d39.81765977832241!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd3d5ea1d1367c61%3A0xb8ce64fd21ff2a9!2sFR%20Cabeleireiros!5e1!3m2!1spt-PT!2spt!4v1780603208853!5m2!1spt-PT!2spt"
-          style="border:0;"
-          allowfullscreen=""
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade">
-        </iframe>
-      </div>
+    <!-- FORMULÁRIO À ESQUERDA -->
+    <section id="reserva" class="form-section">
+      <h2>Fazer marcação</h2>
 
-      <p class="map-caption">📍 Visita‑nos aqui</p>
+      <form id="booking-form">
+        <label>Barbeiro</label>
+        <select name="barber" id="barber" required>
+          <option value="">Escolhe o barbeiro</option>
+          <option value="2703d3fa-b5b5-419a-94ba-00773fe80bb6">Francisco Rodrigues</option>
+          <option value="450143b2-8d3a-4af2-8905-1151d89e561c">Ricardo Pires</option>
+        </select>
+        <p id="ferias-info" style="color:#b91c1c; font-weight:600; margin-top:-5px;"></p>
+
+        <label>Serviço</label>
+        <select name="service" required>
+          <option value="">Escolhe o serviço</option>
+          <option value="corte e lavagem">Corte e Lavagem</option>
+        </select>
+
+        <label>Data</label>
+        <input type="text" name="date" id="date" required />
+
+        <label>Hora</label>
+        <select id="time" name="time" required>
+          <option value="">Escolhe a hora</option>
+        </select>
+
+        <label>Nome</label>
+        <input type="text" name="name" required />
+
+        <label>Telemóvel</label>
+        <input type="tel" name="phone" required />
+
+        <button type="submit" class="btn-reserva">Confirmar marcação</button>
+      </form>
     </section>
 
+    <!-- COLUNA DIREITA -->
+    <div class="right-column">
+
+      <div class="team-title">A equipa da FR Cabeleireiros</div>
+
+      <div class="barbers-grid">
+        <div class="barber-card">
+          <img src="img/francisco.jpg" alt="Francisco Rodrigues">
+          <h3>Francisco Rodrigues</h3>
+        </div>
+
+        <div class="barber-card">
+          <img src="img/ricardo2.jpg" alt="Ricardo Pires">
+          <h3>Ricardo Pires</h3>
+        </div>
+      </div>
+
+      <section class="map-card-section">
+        <h2>Onde estamos</h2>
+
+        <div class="map-wrapper">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1885.4007287702202!2d-7.5044570011774745!3d39.81765977832241!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd3d5ea1d1367c61%3A0xb8ce64fd21ff2a9!2sFR%20Cabeleireiros!5e1!3m2!1spt-PT!2spt!4v1780603208853!5m2!1spt-PT!2spt"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
+        </div>
+
+        <p class="map-caption">📍 Visita‑nos aqui</p>
+      </section>
+
+    </div>
   </div>
-</div>
+</section>
+
+<!-- ABA: PRODUTOS -->
+<section class="site-tab-content" id="tab-produtos">
+  <div class="pagina-simples">
+    <h2>Os nossos produtos</h2>
+    <p class="placeholder-aviso" style="margin-bottom:1.5rem;">📝 Fotos e preços reais em breve — estes são exemplos de layout.</p>
+
+    <div class="produtos-grid">
+      <div class="produto-card" tabindex="0">
+        <img src="https://placehold.co/400x400/e5e7eb/6b7280?text=Produto+1" alt="Produto 1">
+        <div class="produto-overlay">
+          <h4>Nome do Produto</h4>
+          <p>Breve descrição do produto e para que serve.</p>
+          <span class="produto-preco">€0,00</span>
+        </div>
+      </div>
+
+      <div class="produto-card" tabindex="0">
+        <img src="https://placehold.co/400x400/e5e7eb/6b7280?text=Produto+2" alt="Produto 2">
+        <div class="produto-overlay">
+          <h4>Nome do Produto</h4>
+          <p>Breve descrição do produto e para que serve.</p>
+          <span class="produto-preco">€0,00</span>
+        </div>
+      </div>
+
+      <div class="produto-card" tabindex="0">
+        <img src="https://placehold.co/400x400/e5e7eb/6b7280?text=Produto+3" alt="Produto 3">
+        <div class="produto-overlay">
+          <h4>Nome do Produto</h4>
+          <p>Breve descrição do produto e para que serve.</p>
+          <span class="produto-preco">€0,00</span>
+        </div>
+      </div>
+
+      <div class="produto-card" tabindex="0">
+        <img src="https://placehold.co/400x400/e5e7eb/6b7280?text=Produto+4" alt="Produto 4">
+        <div class="produto-overlay">
+          <h4>Nome do Produto</h4>
+          <p>Breve descrição do produto e para que serve.</p>
+          <span class="produto-preco">€0,00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <div id="popup">Reserva confirmada!</div>
 
 <!-- JS -->
 <script type="module" src="js/main.js"></script>
+
+<script>
+  /* NAVEGAÇÃO ENTRE ABAS DO SITE */
+  function irParaAba(tabId) {
+    document.querySelectorAll(".site-tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".site-tab-content").forEach(c => c.classList.remove("active"));
+
+    document.querySelector(`.site-tab-btn[data-tab="${tabId}"]`).classList.add("active");
+    document.getElementById(tabId).classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  document.querySelectorAll(".site-tab-btn, .logo-link, .btn-hero").forEach(el => {
+    el.addEventListener("click", (e) => {
+      e.preventDefault();
+      irParaAba(el.dataset.tab);
+    });
+  });
+
+  /* TOGGLE DE PRODUTOS EM MOBILE (toque em vez de hover) */
+  document.querySelectorAll(".produto-card").forEach(card => {
+    card.addEventListener("click", () => {
+      const jaAtivo = card.classList.contains("touched");
+      document.querySelectorAll(".produto-card").forEach(c => c.classList.remove("touched"));
+      if (!jaAtivo) card.classList.add("touched");
+    });
+  });
+</script>
 
 </body>
 </html>
