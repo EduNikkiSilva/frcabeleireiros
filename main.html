@@ -113,5 +113,45 @@
 <!-- JS -->
 <script type="module" src="js/main.js"></script>
 
+<script>
+  /* CARROSSEL DO HERO */
+  let heroIndex = 0;
+  const heroSlides = document.querySelectorAll(".hero-slide");
+
+  setInterval(() => {
+    heroSlides[heroIndex].classList.remove("active");
+    heroIndex = (heroIndex + 1) % heroSlides.length;
+    heroSlides[heroIndex].classList.add("active");
+  }, 4000);
+</script>
+
+<script>
+  /* NAVEGAÇÃO ENTRE ABAS DO SITE */
+  function irParaAba(tabId) {
+    document.querySelectorAll(".site-tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".site-tab-content").forEach(c => c.classList.remove("active"));
+
+    document.querySelector(`.site-tab-btn[data-tab="${tabId}"]`).classList.add("active");
+    document.getElementById(tabId).classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  document.querySelectorAll(".site-tab-btn, .logo-link, .btn-hero").forEach(el => {
+    el.addEventListener("click", (e) => {
+      e.preventDefault();
+      irParaAba(el.dataset.tab);
+    });
+  });
+
+  /* TOGGLE DE PRODUTOS EM MOBILE (toque em vez de hover) */
+  document.querySelectorAll(".produto-card").forEach(card => {
+    card.addEventListener("click", () => {
+      const jaAtivo = card.classList.contains("touched");
+      document.querySelectorAll(".produto-card").forEach(c => c.classList.remove("touched"));
+      if (!jaAtivo) card.classList.add("touched");
+    });
+  });
+</script>
+
 </body>
 </html>

@@ -29,11 +29,13 @@ body {
 header {
   width: 100%;
   background: var(--primary);
-  padding: 2rem 3rem;
+  padding: 1.5rem 3rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .header-left {
@@ -42,8 +44,12 @@ header {
   gap: 1.5rem;
 }
 
+.logo-link {
+  cursor: pointer;
+}
+
 .logo {
-  height: 120px;
+  height: 90px;
   width: auto;
   border-radius: 12px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.35);
@@ -51,47 +57,222 @@ header {
 
 header h1 {
   color: white;
-  font-size: 2rem;
+  font-size: 1.7rem;
   font-weight: 700;
 }
 
-header button {
-  padding: 0.9rem 1.4rem;
-  background: var(--accent);
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+/* NAVEGAÇÃO POR ABAS DO SITE */
+.site-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.site-tab-btn {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 0.6rem 1.1rem;
+  border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.75);
+  transition: 0.25s ease;
+  white-space: nowrap;
+}
+
+.site-tab-btn:hover {
+  background: rgba(255,255,255,0.15);
+  color: white;
+}
+
+.site-tab-btn.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: #111;
+}
+
+.site-tab-content {
+  display: none;
+}
+
+.site-tab-content.active {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 122px);
+  animation: fadeInTab 0.3s ease;
+}
+
+.site-tab-content.active > *:not(.site-footer):not(.hero) {
+  flex: 0 0 auto;
+}
+
+.site-tab-content .site-footer,
+.site-tab-content .hero {
+  margin-top: auto;
+}
+
+.site-footer {
+  text-align: center;
+  padding: 1.5rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+@keyframes fadeInTab {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* HERO COM CARROSSEL (ABA INÍCIO) */
+.hero {
+  position: relative;
+  min-height: calc(100vh - 122px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: white;
+  text-align: center;
+}
+
+.hero-carrossel {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(4px) brightness(0.55);
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.hero-slide.active {
+  opacity: 1;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(17,24,39,0.55), rgba(31,41,55,0.55));
+  z-index: 1;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 2rem 1.5rem;
+}
+
+.hero-content h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 0.8rem;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+
+.hero-content p {
+  font-size: 1.05rem;
+  color: rgba(255,255,255,0.9);
+  max-width: 500px;
+  margin: 0 auto 1.8rem;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.3);
+}
+
+.btn-hero {
+  padding: 0.9rem 1.8rem;
+  background: var(--accent);
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 700;
   color: #111827;
   box-shadow: 0 4px 12px rgba(0,0,0,0.25);
   transition: 0.25s ease;
 }
 
-header button:hover {
+.btn-hero:hover {
   background: var(--accent-dark);
   transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(0,0,0,0.35);
 }
 
-/* LAYOUT */
-.layout {
+/* PÁGINAS SIMPLES (História, Equipa, Produtos) */
+.pagina-simples {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+.pagina-simples h2 {
+  text-align: center;
+  font-size: 1.8rem;
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+}
+
+.placeholder-aviso {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  background: #fff7e6;
+  border: 1px dashed var(--accent);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+/* EQUIPA (aba dedicada) */
+.equipa-grid {
   display: grid;
-  grid-template-columns: 1fr 520px;
+  grid-template-columns: 1fr 1fr;
   gap: 2rem;
-  max-width: 1200px;
+}
+
+.equipa-card {
+  background: var(--card);
+  padding: 1.5rem;
+  border-radius: 1.3rem;
+  box-shadow: var(--shadow-soft);
+  text-align: center;
+}
+
+.equipa-card img {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.equipa-card h3 {
+  font-size: 1.2rem;
+  color: var(--primary);
+  margin-bottom: 0.6rem;
+}
+
+/* LAYOUT (ABA MARCAÇÕES) - formulário centrado */
+.layout-centrado {
+  width: 100%;
+  display: flex;
+  justify-content: center;
   margin: 3rem auto;
   padding: 0 1.5rem;
-  align-items: flex-start;
 }
 
 /* FORMULÁRIO */
 .form-section {
-  padding: 1.5rem 2rem;
+  padding: 2rem 2.5rem;
   background: var(--card);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-soft);
   margin-top: 2rem;
+  width: 100%;
+  max-width: 700px;
 }
 
 .form-section h2 {
@@ -152,51 +333,6 @@ select:focus {
   background: linear-gradient(135deg, #f59e0b, #d97706);
 }
 
-/* BARBEIROS / EQUIPA */
-.team-title {
-  margin-top: 1rem;
-  font-size: 1.4rem;
-  font-weight: 700;
-  margin-bottom: 1.3rem;
-  text-align: center;
-  color: var(--primary);
-}
-
-.right-column {
-  display: grid;
-  grid-template-rows: auto auto auto;
-  gap: 2rem;
-}
-
-.barbers-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-}
-
-.barber-card {
-  background: var(--card);
-  padding: 1.5rem;
-  border-radius: 2rem;
-  box-shadow: var(--shadow-soft);
-  text-align: center;
-  height: 100%;
-}
-
-.barber-card img {
-  width: 100%;
-  height: 310px;
-  object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: 1rem;
-}
-
-.barber-card h3 {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--primary);
-}
-
 /* MAPA */
 .map-card-section {
   background: var(--card);
@@ -233,6 +369,79 @@ select:focus {
   color: var(--primary);
 }
 
+/* PRODUTOS */
+.produtos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.produto-card {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  aspect-ratio: 1 / 1;
+  cursor: pointer;
+}
+
+.produto-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: 0.3s ease;
+}
+
+.produto-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.85);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.2rem;
+  opacity: 0;
+  transition: 0.3s ease;
+}
+
+.produto-overlay h4 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.produto-overlay p {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.8);
+  margin-bottom: 0.8rem;
+}
+
+.produto-preco {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+/* Desktop: hover */
+@media (hover: hover) {
+  .produto-card:hover img {
+    filter: blur(3px) brightness(0.6);
+  }
+  .produto-card:hover .produto-overlay {
+    opacity: 1;
+  }
+}
+
+/* Mobile/touch: classe "touched" adicionada via JS */
+.produto-card.touched img {
+  filter: blur(3px) brightness(0.6);
+}
+.produto-card.touched .produto-overlay {
+  opacity: 1;
+}
+
 /* POPUP */
 #popup {
   position: fixed;
@@ -251,37 +460,18 @@ select:focus {
 
 /* RESPONSIVO */
 @media (max-width: 900px) {
-  .layout {
-    grid-template-columns: 1fr;
-  }
-
-  .right-column {
-    grid-template-rows: auto auto;
-  }
-
   header {
     flex-direction: column;
-    gap: 1rem;
     text-align: center;
+  }
+
+  .equipa-grid {
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 600px) {
-  .barbers-grid {
-    grid-template-columns: 1fr;
-  }
-
   .form-section {
     padding: 1.2rem 1.4rem;
   }
-}
-
-/* =========================================================
-   RODAPÉ
-========================================================= */
-.login-footer {
-  padding: 1.5rem 0;
-  text-align: center;
-  font-size: 0.8rem;
-  color: var(--text-muted);
 }
