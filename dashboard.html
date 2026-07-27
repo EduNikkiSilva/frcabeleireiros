@@ -27,14 +27,19 @@
       <strong>FR Cabeleireiros · Painel de Colaborador</strong>
     </div>
 
-    <div class="tabs-nav">
-      <button class="tab-btn active" data-tab="tab-marcacoes">📅 Marcações</button>
-      <button class="tab-btn" data-tab="tab-ferias">🏖️ Férias</button>
-      <button class="tab-btn" data-tab="tab-pausas">☕ Pausas</button>
-      <button class="tab-btn" data-tab="tab-conta">⚙️ A minha conta</button>
-    </div>
+    <div class="header-actions">
+      <div class="tabs-nav">
+        <button class="tab-btn active" data-tab="tab-marcacoes">📅 Marcações</button>
+        <button class="tab-btn" data-tab="tab-ferias">🏖️ Férias</button>
+        <button class="tab-btn" data-tab="tab-pausas">☕ Pausas</button>
+        <button class="tab-btn" data-tab="tab-conta">⚙️ A minha conta</button>
+      </div>
 
-    <button id="logout-btn">Sair</button>
+      <button id="logout-btn" title="Sair">
+        <img id="logout-foto" src="" alt="Sair" class="logout-foto">
+        <span class="logout-overlay">Sair</span>
+      </button>
+    </div>
   </div>
 </header>
 
@@ -168,27 +173,37 @@
     </div>
   </section>
 
-  <!-- ABA: CONTA -->
+<!-- ABA: CONTA -->
   <section class="tab-content" id="tab-conta">
-    <section class="card card-full">
-      <h2>A minha conta</h2>
-      <p class="conta-username">Sessão iniciada como <strong id="conta-username-atual">...</strong></p>
+    <div class="conta-header">
+      <img class="conta-avatar-foto" id="conta-avatar-foto" src="" alt="Foto de perfil" style="display:none;">
+      <span class="conta-avatar" id="conta-avatar">?</span>
+      <div>
+        <h2 style="margin:0; text-transform:none; font-size:1.3rem;">A minha conta</h2>
+        <p class="conta-username">Sessão iniciada como <strong id="conta-username-atual">...</strong></p>
+      </div>
+    </div>
 
-      <div class="conta-secao">
-        <h3 class="subtitle">Confirmar identidade</h3>
-        <p class="form-hint">Introduz a tua password atual para poderes alterar os dados abaixo</p>
+    <div class="marcacoes-grid">
+
+      <!-- COLUNA ESQUERDA: CONFIRMAR IDENTIDADE -->
+      <section class="card">
+        <h2>🔑 Confirmar identidade</h2>
+        <p class="form-hint">Introduz a tua password atual para poderes alterar os dados ao lado</p>
 
         <label>Password atual</label>
         <div class="password-wrapper">
           <input type="password" id="conta-password-atual" class="input-modern" placeholder="Password atual" />
           <button type="button" class="toggle-password" data-target="conta-password-atual">👁️</button>
         </div>
-      </div>
 
-      <div class="conta-divider"></div>
+        <p class="conta-aviso">🔒 Usa uma password que só tu conheces e não partilhes com ninguém.</p>
+      </section>
 
-      <div class="conta-secao">
-        <h3 class="subtitle">Novos dados (opcional)</h3>
+      <!-- COLUNA DIREITA: NOVOS DADOS -->
+      <section class="card">
+        <h2>✏️ Novos dados</h2>
+        <p class="form-hint">Deixa em branco o que não quiseres alterar</p>
 
         <label>Novo username</label>
         <input type="text" id="conta-novo-username" class="input-modern" placeholder="Deixa em branco para não alterar" />
@@ -204,12 +219,11 @@
           <input type="password" id="conta-confirmar-password" class="input-modern" placeholder="Repete a nova password" />
           <button type="button" class="toggle-password" data-target="conta-confirmar-password">👁️</button>
         </div>
-      </div>
 
-      <p class="conta-aviso">🔒 Usa uma password que só tu conheces e não partilhes com ninguém.</p>
+        <button id="btn-guardar-conta" class="btn-primary">💾 Guardar alterações</button>
+      </section>
 
-      <button id="btn-guardar-conta" class="btn-primary">💾 Guardar alterações</button>
-    </section>
+    </div>
   </section>
 
 </div>

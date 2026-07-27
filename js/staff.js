@@ -70,6 +70,7 @@ async function carregarBarbeiro() {
       barbeiros(where: { id: { _eq: $id } }) {
         nome
         username
+        foto
       }
     }
   `;
@@ -83,6 +84,22 @@ async function carregarBarbeiro() {
 
     const contaUsername = document.getElementById("conta-username-atual");
     if (contaUsername) contaUsername.textContent = data.username;
+
+    const contaAvatar = document.getElementById("conta-avatar");
+    const contaAvatarFoto = document.getElementById("conta-avatar-foto");
+
+    if (data.foto && contaAvatarFoto) {
+      contaAvatarFoto.src = data.foto;
+      contaAvatarFoto.style.display = "block";
+      if (contaAvatar) contaAvatar.style.display = "none";
+    } else if (contaAvatar) {
+      contaAvatar.textContent = data.nome.charAt(0);
+    }
+
+    const logoutFoto = document.getElementById("logout-foto");
+    if (logoutFoto && data.foto) {
+      logoutFoto.src = data.foto;
+    }
   }
 }
 
@@ -99,6 +116,7 @@ async function carregarReservas() {
         hora
         cliente_nome
         cliente_telemovel
+        concluida
       }
     }
   `;
@@ -120,25 +138,49 @@ async function carregarReservas() {
     return;
   }
 
+  const pendentes = data.filter(r => !r.concluida);
   const agora = new Date().toTimeString().slice(0, 5);
-  const proxima = data.find(r => r.hora.slice(0, 5) >= agora);
+  const proxima = pendentes.find(r => r.hora.slice(0, 5) >= agora);
 
   resumo.innerHTML = proxima
     ? `Hoje: <strong>${data.length}</strong> marcação(ões) · Próxima às <strong>${proxima.hora.slice(0, 5)}</strong>`
-    : `Hoje: <strong>${data.length}</strong> marcação(ões) · Todas já passaram`;
+    : `Hoje: <strong>${data.length}</strong> marcação(ões) · Todas já passaram ou concluídas`;
 
   data.forEach(r => {
     const div = document.createElement("div");
-    div.className = "reserva-item";
+    div.className = "reserva-item" + (r.concluida ? " concluida" : "");
     div.innerHTML = `
       <span class="hora-badge">${r.hora.slice(0, 5)}</span>
       <div class="reserva-info">
         <strong>${r.cliente_nome}</strong>
         <a href="tel:${r.cliente_telemovel}">📞 ${r.cliente_telemovel}</a>
       </div>
+      <button class="btn-concluir ${r.concluida ? 'ativo' : ''}" onclick="alternarConcluida('${r.id}', ${!r.concluida})" title="${r.concluida ? 'Marcar como não atendida' : 'Marcar como atendida'}">
+        ✅
+      </button>
     `;
     ul.appendChild(div);
   });
+}
+
+async function alternarConcluida(id, novoEstado) {
+  const mutation = `
+    mutation MarcarConcluida($id: uuid!, $concluida: Boolean!) {
+      update_reservas_by_pk(pk_columns: { id: $id }, _set: { concluida: $concluida }) {
+        id
+      }
+    }
+  `;
+
+  const response = await nhost.graphql.request(mutation, { id, concluida: novoEstado });
+
+  if (response.error) {
+    console.error("Erro ao atualizar reserva:", response.error);
+    alert("Erro ao atualizar estado da reserva.");
+    return;
+  }
+
+  await carregarReservas();
 }
 
 async function carregarFerias() {
@@ -836,6 +878,7 @@ document.getElementById("logout-btn").addEventListener("click", () => {
 /* ---------------- ALTERAR DADOS DE ACESSO (CONTA) ---------------- */
 
 document.getElementById("btn-guardar-conta").addEventListener("click", async () => {
+  const btnGuardarConta = document.getElementById("btn-guardar-conta");
   const passwordAtual = document.getElementById("conta-password-atual").value;
   const novoUsername = document.getElementById("conta-novo-username").value.trim();
   const novaPassword = document.getElementById("conta-nova-password").value;
@@ -861,6 +904,9 @@ document.getElementById("btn-guardar-conta").addEventListener("click", async () 
   if (novoUsername) alteracoes.username = novoUsername;
   if (novaPassword) alteracoes.password = novaPassword;
 
+  btnGuardarConta.disabled = true;
+  btnGuardarConta.textContent = "A guardar...";
+
   const mutation = `
     mutation AlterarConta($id: uuid!, $passwordAtual: String!, $obj: barbeiros_set_input!) {
       update_barbeiros(
@@ -884,6 +930,8 @@ document.getElementById("btn-guardar-conta").addEventListener("click", async () 
   if (response.error) {
     console.error("Erro ao alterar conta:", response.error);
     alert("Erro ao guardar alterações.");
+    btnGuardarConta.disabled = false;
+    btnGuardarConta.textContent = "💾 Guardar alterações";
     return;
   }
 
@@ -891,6 +939,8 @@ document.getElementById("btn-guardar-conta").addEventListener("click", async () 
 
   if (affected === 0) {
     alert("Password atual incorreta. Nenhuma alteração foi feita.");
+    btnGuardarConta.disabled = false;
+    btnGuardarConta.textContent = "💾 Guardar alterações";
     return;
   }
 
@@ -960,6 +1010,7 @@ async function carregarHistorico(inicio, fim, mostrarApenasHora) {
         hora
         cliente_nome
         cliente_telemovel
+        concluida
       }
     }
   `;
@@ -982,7 +1033,7 @@ async function carregarHistorico(inicio, fim, mostrarApenasHora) {
 
   data.forEach(r => {
     const div = document.createElement("div");
-    div.className = "reserva-item";
+    div.className = "reserva-item" + (r.concluida ? " concluida" : "");
 
     const rotuloHora = mostrarApenasHora
       ? r.hora.slice(0, 5)
@@ -994,10 +1045,33 @@ async function carregarHistorico(inicio, fim, mostrarApenasHora) {
         <strong>${r.cliente_nome}</strong>
         <a href="tel:${r.cliente_telemovel}">📞 ${r.cliente_telemovel}</a>
       </div>
+      <button class="btn-concluir ${r.concluida ? 'ativo' : ''}" onclick="alternarConcluidaHistorico('${r.id}', ${!r.concluida}, '${inicio}', '${fim}', ${mostrarApenasHora})" title="${r.concluida ? 'Marcar como não atendida' : 'Marcar como atendida'}">
+        ✅
+      </button>
       <button class="btn-delete-reserva" onclick="apagarReservaHistorico('${r.id}', '${inicio}', '${fim}', ${mostrarApenasHora})">✖</button>
     `;
     ul.appendChild(div);
   });
+}
+
+async function alternarConcluidaHistorico(id, novoEstado, inicio, fim, mostrarApenasHora) {
+  const mutation = `
+    mutation MarcarConcluida($id: uuid!, $concluida: Boolean!) {
+      update_reservas_by_pk(pk_columns: { id: $id }, _set: { concluida: $concluida }) {
+        id
+      }
+    }
+  `;
+
+  const response = await nhost.graphql.request(mutation, { id, concluida: novoEstado });
+
+  if (response.error) {
+    console.error("Erro ao atualizar reserva:", response.error);
+    alert("Erro ao atualizar estado da reserva.");
+    return;
+  }
+
+  await carregarHistorico(inicio, fim, mostrarApenasHora);
 }
 
 async function apagarReservaHistorico(id, inicio, fim, mostrarApenasHora) {
@@ -1029,6 +1103,8 @@ window.apagarFerias = apagarFerias;
 window.apagarPausa = apagarPausa;
 window.apagarGrupoPausas = apagarGrupoPausas;
 window.apagarReservaHistorico = apagarReservaHistorico;
+window.alternarConcluida = alternarConcluida;
+window.alternarConcluidaHistorico = alternarConcluidaHistorico;
 
 /* ---------------- TIMEOUT DE INATIVIDADE ---------------- */
 
