@@ -17,7 +17,7 @@
   <script type="module" src="js/nhost.js"></script>
 </head>
 
-<body>
+<body class="dashboard">
 
   <header>
     <div class="header-top">
@@ -44,6 +44,8 @@
       </div>
     </div>
   </header>
+
+
 
   <div class="wrapper">
 
@@ -129,6 +131,8 @@
       </div>
     </section>
 
+
+
     <!-- ABA: FÉRIAS -->
     <section class="tab-content" id="tab-ferias">
       <section class="card card-full">
@@ -183,6 +187,8 @@
 
       </div>
     </section>
+
+
 
     <!-- ABA: CONTA -->
     <section class="tab-content" id="tab-conta">
@@ -241,6 +247,8 @@
       </div>
     </section>
 
+
+
     <!-- ABA: DADOS (só para o owner) -->
     <section class="tab-content" id="tab-dados">
       <section class="card card-full">
@@ -276,9 +284,20 @@
       </section>
     </section>
   </div>
-
   </div>
 
+  <!-- NAVEGAÇÃO ENTRE ABAS -->
+  <script>
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+
+        btn.classList.add("active");
+        document.getElementById(btn.dataset.tab).classList.add("active");
+      });
+    });
+  </script>
   <!-- MODAL -->
   <div id="modal-bg">
     <div id="modal">
@@ -294,23 +313,11 @@
     </div>
   </div>
 
+  <!-- Rodapé (fora de wrappers) -->
+  <footer class="site-footer">FR Cabeleireiros © 2026</footer>
+
   <!-- JS -->
   <script type="module" src="js/staff/main.js"></script>
-
-  <!-- NAVEGAÇÃO ENTRE ABAS -->
-  <script>
-    document.querySelectorAll(".tab-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-        document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
-
-        btn.classList.add("active");
-        document.getElementById(btn.dataset.tab).classList.add("active");
-      });
-    });
-  </script>
-
-  <footer class="site-footer">FR Cabeleireiros © 2026</footer>
 
 </body>
 

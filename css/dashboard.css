@@ -832,3 +832,38 @@ header strong {
   color: #374151;
   margin-left: 0.4rem;
 }
+
+/* ==============================
+   Footer fixo - dashboard only
+   ============================== */
+body.dashboard .site-footer {
+  position: fixed;            /* fixa em relação à janela */
+  left: 50%;                  /* centra horizontalmente */
+  transform: translateX(-50%);
+  bottom: 200px;              /* distância do fundo - ajusta conforme desejado */
+  z-index: 1000;              /* acima do conteúdo */
+  width: auto;                /* largura conforme conteúdo (não full-width) */
+  padding: 0.6rem 1.2rem;
+  background: transparent;    /* sem bloco branco atrás */
+  box-shadow: none;
+  color: var(--text-muted);
+  border-radius: 8px;         /* opcional, estética */
+  pointer-events: auto;
+}
+
+/* Evitar que o conteúdo fique por baixo do footer:
+   ajusta padding-bottom para >= bottom + footerHeight + folga */
+body.dashboard .wrapper {
+  padding-bottom: 320px; /* ajuste inicial; diminui/aumenta conforme quiseres */
+}
+
+/* Mobile: reduzir distância e padding para pequenas telas */
+@media (max-width: 900px) {
+  body.dashboard .site-footer {
+    bottom: 60px;
+    padding: 0.5rem 1rem;
+  }
+  body.dashboard .wrapper {
+    padding-bottom: 160px;
+  }
+}

@@ -1,3 +1,7 @@
+// js/staff/barbeiro.js
+import { nhost } from '../nhost.js';
+import { state } from './state.js';
+
 export async function carregarBarbeiro() {
   const query = `
     query GetBarbeiro($id: uuid!) {
@@ -33,7 +37,7 @@ export async function carregarBarbeiro() {
       contaAvatar.textContent = data.nome.charAt(0);
     }
 
-    // substituir/usar este bloco para definir o botão de logout com segurança
+    // definir o botão de logout com segurança
     const logoutFoto = document.getElementById("logout-foto");
     if (logoutFoto) {
       if (data.foto) {

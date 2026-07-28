@@ -478,3 +478,18 @@ select:focus {
     padding: 1.2rem 1.4rem;
   }
 }
+
+/* garantir footer full-width e centrado */
+.site-footer {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  padding: 1.5rem 1rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  background: transparent !important;
+  border-top: none !important;
+  box-shadow: none !important;
+  margin: 0;
+}
