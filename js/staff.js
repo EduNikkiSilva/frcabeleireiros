@@ -60,6 +60,7 @@ async function checkSession() {
   iniciarFlatpickrManual();
   iniciarFlatpickrFerias();
   iniciarFlatpickrPausa();
+  await verificarOwner();
 }
 
 /* ---------------- CARREGAR DADOS ---------------- */
@@ -965,6 +966,236 @@ document.querySelectorAll(".toggle-password").forEach(btn => {
     }
   });
 });
+
+/* ---------------- GESTÃO DE DADOS (OWNER) ---------------- */
+
+let isOwner = false;
+
+async function verificarOwner() {
+  const query = `
+    query VerificarOwner($id: uuid!) {
+      barbeiros(where: { id: { _eq: $id } }) {
+        owner
+      }
+    }
+  `;
+
+  const response = await nhost.graphql.request(query, { id: barbeiroId });
+  isOwner = response.data?.barbeiros?.[0]?.owner || false;
+
+  if (isOwner) {
+    document.getElementById("tab-btn-dados").style.display = "inline-block";
+    await verificarReservasAntigas();
+    verificarLembreteFimMes();
+    await verificarDisponibilidadeLimpeza();
+  }
+}
+
+function dataLimite2Meses() {
+  const limite = new Date();
+  limite.setMonth(limite.getMonth() - 2);
+  return limite.toISOString().split("T")[0];
+}
+
+async function verificarReservasAntigas() {
+  const limite = dataLimite2Meses();
+
+  const query = `
+    query ContarAntigas($limite: date!) {
+      reservas_aggregate(where: { data: { _lte: $limite } }) {
+        aggregate { count }
+      }
+    }
+  `;
+
+  const response = await nhost.graphql.request(query, { limite });
+  const count = response.data?.reservas_aggregate?.aggregate?.count || 0;
+
+  if (count > 0) {
+    mostrarBannerLimpeza(count);
+  }
+}
+
+function mostrarBannerLimpeza(count) {
+  const banner = document.createElement("div");
+  banner.className = "banner-aviso-limpeza";
+  banner.textContent = `⚠️ Tens ${count} reserva(s) com mais de 2 meses. Clica para exportar e limpar os dados.`;
+  banner.addEventListener("click", () => {
+    document.getElementById("tab-btn-dados").click();
+  });
+  document.body.insertBefore(banner, document.body.firstChild);
+}
+
+/* ---------------- EXPORTAR RESERVAS PARA EXCEL ---------------- */
+
+function primeiroDiaDoMes(mesStr) {
+  return `${mesStr}-01`;
+}
+
+function ultimoDiaDoMesStr(mesStr) {
+  const [ano, mes] = mesStr.split("-").map(Number);
+  const ultimoDia = new Date(ano, mes, 0).getDate();
+  return `${mesStr}-${String(ultimoDia).padStart(2, "0")}`;
+}
+
+document.getElementById("btn-exportar-excel").addEventListener("click", async () => {
+  const mesInicio = document.getElementById("export-mes-inicio").value;
+  const mesFim = document.getElementById("export-mes-fim").value;
+
+  if (!mesInicio || !mesFim) {
+    alert("Escolhe o mês de início e de fim.");
+    return;
+  }
+
+  const inicio = primeiroDiaDoMes(mesInicio);
+  const fim = ultimoDiaDoMesStr(mesFim);
+
+  if (fim < inicio) {
+    alert("O mês de fim não pode ser anterior ao mês de início.");
+    return;
+  }
+
+  const query = `
+    query ExportarReservas($inicio: date!, $fim: date!) {
+      reservas(where: {
+        data: { _gte: $inicio, _lte: $fim }
+      }, order_by: [{ data: asc }, { hora: asc }]) {
+        data
+        hora
+        cliente_nome
+        cliente_telemovel
+        servico
+        concluida
+        barbeiro_id
+      }
+      barbeiros {
+        id
+        nome
+      }
+    }
+  `;
+
+  const response = await nhost.graphql.request(query, { inicio, fim });
+
+  if (response.error) {
+    console.error("Erro ao exportar:", response.error);
+    alert("Erro ao exportar reservas.");
+    return;
+  }
+
+  const reservas = response.data.reservas;
+  const barbeirosMap = {};
+  response.data.barbeiros.forEach(b => barbeirosMap[b.id] = b.nome);
+
+  if (!reservas.length) {
+    alert("Não há reservas neste período.");
+    return;
+  }
+
+  const linhas = reservas.map(r => ({
+    Data: r.data,
+    Hora: r.hora.slice(0, 5),
+    Barbeiro: barbeirosMap[r.barbeiro_id] || "Desconhecido",
+    Cliente: r.cliente_nome,
+    Telemóvel: r.cliente_telemovel,
+    Serviço: r.servico,
+    Atendida: r.concluida ? "Sim" : "Não"
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(linhas);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Reservas");
+  XLSX.writeFile(wb, `reservas_${mesInicio}_a_${mesFim}.xlsx`);
+
+  mostrarMensagem("Excel exportado com sucesso!");
+});
+
+/* ---------------- APAGAR RESERVAS ANTIGAS (SÓ NO DIA 1, UMA VEZ POR MÊS) ---------------- */
+
+function mesAtualStr() {
+  const hoje = new Date();
+  return `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function cutoffDoisMesesAtras() {
+  const hoje = new Date();
+  const cutoff = new Date(hoje.getFullYear(), hoje.getMonth() - 2, 1);
+  const ano = cutoff.getFullYear();
+  const mes = String(cutoff.getMonth() + 1).padStart(2, "0");
+  return `${ano}-${mes}-01`;
+}
+
+async function verificarDisponibilidadeLimpeza() {
+  const btn = document.getElementById("btn-limpar-antigas");
+  const status = document.getElementById("limpeza-status");
+  const hoje = new Date();
+
+  const query = `
+    query UltimaLimpeza($id: uuid!) {
+      barbeiros(where: { id: { _eq: $id } }) {
+        limpeza
+      }
+    }
+  `;
+
+  const response = await nhost.graphql.request(query, { id: barbeiroId });
+  const ultimaLimpeza = response.data?.barbeiros?.[0]?.limpeza;
+  const ultimaLimpezaMes = ultimaLimpeza ? ultimaLimpeza.slice(0, 7) : null;
+
+  const ehDia1 = hoje.getDate() === 1;
+  const jaLimpouEsteMes = ultimaLimpezaMes === mesAtualStr();
+
+  if (jaLimpouEsteMes) {
+    btn.disabled = true;
+    status.textContent = "✅ Já limpaste os dados este mês. Disponível novamente no dia 1 do próximo mês.";
+  } else if (!ehDia1) {
+    btn.disabled = true;
+    status.textContent = "🔒 Esta ação só fica disponível no dia 1 de cada mês.";
+  } else {
+    btn.disabled = false;
+    status.textContent = "🟢 Disponível hoje — podes limpar os dados com mais de 2 meses.";
+  }
+}
+
+document.getElementById("btn-limpar-antigas").addEventListener("click", async () => {
+  const limite = cutoffDoisMesesAtras();
+
+  const confirmacao = confirm(
+    `Isto vai apagar PERMANENTEMENTE todas as reservas anteriores a ${limite} (mais de 2 meses).\n\nJá exportaste esses dados para Excel? Esta ação não pode ser desfeita.`
+  );
+
+  if (!confirmacao) return;
+
+  const mutation = `
+    mutation LimparAntigas($limite: date!, $id: uuid!, $hoje: date!) {
+      delete_reservas(where: { data: { _lt: $limite } }) {
+        affected_rows
+      }
+      update_barbeiros_by_pk(pk_columns: { id: $id }, _set: { limpeza: $hoje }) {
+        id
+      }
+    }
+  `;
+
+  const hoje = new Date().toISOString().split("T")[0];
+
+  const response = await nhost.graphql.request(mutation, { limite, id: barbeiroId, hoje });
+
+  if (response.error) {
+    console.error("Erro ao limpar reservas:", response.error);
+    alert("Erro ao apagar reservas antigas.");
+    return;
+  }
+
+  const apagadas = response.data?.delete_reservas?.affected_rows || 0;
+  alert(`${apagadas} reserva(s) apagada(s) com sucesso.`);
+
+  const banner = document.querySelector(".banner-aviso-limpeza");
+  if (banner) banner.remove();
+
+  await verificarDisponibilidadeLimpeza();
+});
+
 
 /* ---------------- INICIAR ---------------- */
 

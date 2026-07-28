@@ -681,3 +681,63 @@ header strong {
   padding-top: 1rem;
   text-align: center;
 }
+
+/* =========================================================
+   ABA "DADOS" (owner)
+========================================================= */
+.dados-aviso {
+  background: #fff7e6;
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  color: #92400e;
+}
+
+.btn-delete-full {
+  width: 100%;
+  padding: 0.75rem;
+  background: #dc2626;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: 0.25s ease;
+  margin-top: 0.5rem;
+}
+
+.btn-delete-full:hover {
+  background: #b91c1c;
+  transform: translateY(-2px);
+}
+
+.btn-delete-full:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-delete-full:disabled:hover {
+  background: #d1d5db;
+  transform: none;
+}
+
+/* =========================================================
+   BANNER DE AVISO (limpeza a aproximar-se)
+========================================================= */
+.banner-aviso-limpeza {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  text-align: center;
+  padding: 0.8rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.banner-aviso-limpeza:hover {
+  filter: brightness(0.95);
+}

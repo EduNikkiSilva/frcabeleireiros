@@ -9,6 +9,9 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
+  <!-- SheetJS (exportar Excel) -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+
   <!-- CSS -->
   <link rel="stylesheet" href="css/dashboard.css">
 
@@ -33,6 +36,7 @@
         <button class="tab-btn" data-tab="tab-ferias">🏖️ Férias</button>
         <button class="tab-btn" data-tab="tab-pausas">☕ Pausas</button>
         <button class="tab-btn" data-tab="tab-conta">⚙️ A minha conta</button>
+        <button class="tab-btn" data-tab="tab-dados" id="tab-btn-dados" style="display:none;">📦 Dados</button>
       </div>
 
       <button id="logout-btn" title="Sair">
@@ -225,6 +229,41 @@
 
     </div>
   </section>
+
+  <!-- ABA: DADOS (só para o owner) -->
+    <section class="tab-content" id="tab-dados">
+      <section class="card card-full">
+        <h2>📦 Gestão de Dados</h2>
+        <p class="form-hint">Exporta e limpa reservas antigas para manter a base de dados leve.</p>
+
+        <div id="aviso-limpeza" class="dados-aviso" style="display:none;"></div>
+
+        <h3 class="subtitle">Exportar reservas</h3>
+        <p class="form-hint">Escolhe o período que queres exportar para Excel</p>
+
+        <div class="form-row">
+          <div>
+            <label>Mês início</label>
+            <input type="month" id="export-mes-inicio" class="input-modern" />
+          </div>
+          <div>
+            <label>Mês fim</label>
+            <input type="month" id="export-mes-fim" class="input-modern" />
+          </div>
+        </div>
+
+        <button id="btn-exportar-excel" class="btn-primary">📥 Exportar para Excel</button>
+
+        <div class="conta-divider"></div>
+
+        <h3 class="subtitle">Limpar reservas antigas</h3>
+        <p class="form-hint">Apaga todas as reservas com mais de 2 meses. Exporta primeiro! Só disponível no dia 1 de cada mês.</p>
+
+        <button id="btn-limpar-antigas" class="btn-delete-full">🗑️ Apagar reservas com mais de 2 meses</button>
+        <p id="limpeza-status" class="form-hint" style="margin-top:0.6rem;"></p>
+      </section>
+    </section>
+  </div>
 
 </div>
 
