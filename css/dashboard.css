@@ -741,3 +741,94 @@ header strong {
 .banner-aviso-limpeza:hover {
   filter: brightness(0.95);
 }
+
+/* ========== CAIXA DE NOTIFICAÇÕES ========== */
+
+#notificacoes-box {
+  max-width: 600px;
+  margin: 1rem auto;
+  background: #fffbeb;
+  border: 1px solid #f59e0b;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.notificacao-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  background: #f59e0b;
+  color: white;
+  font-weight: 600;
+}
+
+#notificacao-fechar {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.1rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+#notificacao-conteudo {
+  padding: 1rem;
+}
+
+.notificacao-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  padding: 0.9rem;
+  background: white;
+  border-radius: 8px;
+  border-left: 4px solid #f59e0b;
+}
+
+.notificacao-item.urgente {
+  border-left-color: #ef4444;
+  background: #fef2f2;
+}
+
+.notificacao-item p {
+  margin: 0.3rem 0 0;
+  color: #4b5563;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.notificacao-item .btn-exportar,
+.notificacao-item .btn-dispensar {
+  margin-top: 0.6rem;
+  padding: 0.45rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.notificacao-item .btn-exportar:hover,
+.notificacao-item .btn-dispensar:hover {
+  opacity: 0.85;
+}
+
+.notificacao-item .btn-exportar {
+  background: #10b981;
+  color: white;
+}
+
+.notificacao-item .btn-dispensar {
+  background: #e5e7eb;
+  color: #374151;
+  margin-left: 0.4rem;
+}

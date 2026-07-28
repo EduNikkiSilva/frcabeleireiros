@@ -51,6 +51,15 @@
 
   <div id="bemvindo"></div>
 
+  <!-- CAIXA DE NOTIFICAÇÕES (só visível para owner) -->
+  <div id="notificacoes-box" style="display:none;">
+    <div class="notificacao-header">
+      <span>🔔 Notificações</span>
+      <button id="notificacao-fechar" title="Fechar">✕</button>
+    </div>
+    <div id="notificacao-conteudo"></div>
+  </div>
+
   <!-- ABA: MARCAÇÕES -->
   <section class="tab-content active" id="tab-marcacoes">
     <div class="marcacoes-grid">
@@ -283,7 +292,7 @@
 </div>
 
 <!-- JS -->
-<script type="module" src="js/staff.js"></script>
+<script type="module" src="js/staff/main.js"></script>
 
 <!-- NAVEGAÇÃO ENTRE ABAS -->
 <script>
