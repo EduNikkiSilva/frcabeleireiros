@@ -493,3 +493,13 @@ select:focus {
   box-shadow: none !important;
   margin: 0;
 }
+
+/* esconder o footer enquanto o body tem a classe loading */
+body.loading .site-footer {
+  display: none !important;
+}
+
+/* opcional: deixar o background neutro e centralizar qualquer loader inline */
+body.loading {
+  overflow: hidden;
+}
