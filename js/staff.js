@@ -991,6 +991,11 @@ async function verificarOwner() {
   }
 }
 
+function verificarLembreteFimMes() {
+  // Placeholder — lembrete de fim de mês para o owner
+  // Podes implementar depois se quiseres mostrar um aviso no último dia do mês
+}
+
 function dataLimite2Meses() {
   const limite = new Date();
   limite.setMonth(limite.getMonth() - 2);
@@ -1025,6 +1030,8 @@ function mostrarBannerLimpeza(count) {
   });
   document.body.insertBefore(banner, document.body.firstChild);
 }
+
+/* ---------------- EXPORTAR RESERVAS PARA EXCEL ---------------- */
 
 /* ---------------- EXPORTAR RESERVAS PARA EXCEL ---------------- */
 
@@ -1064,7 +1071,6 @@ document.getElementById("btn-exportar-excel").addEventListener("click", async ()
         hora
         cliente_nome
         cliente_telemovel
-        servico
         concluida
         barbeiro_id
       }
@@ -1075,39 +1081,72 @@ document.getElementById("btn-exportar-excel").addEventListener("click", async ()
     }
   `;
 
-  const response = await nhost.graphql.request(query, { inicio, fim });
+  try {
+    const response = await nhost.graphql.request(query, { inicio, fim });
 
-  if (response.error) {
-    console.error("Erro ao exportar:", response.error);
-    alert("Erro ao exportar reservas.");
-    return;
+    if (response.error || response.errors) {
+      console.error("Erro ao exportar:", response.error || response.errors);
+      alert("Erro ao exportar reservas. Verifica a consola (F12).");
+      return;
+    }
+
+    if (!response.data) {
+      alert("Erro: o servidor não devolveu dados.");
+      return;
+    }
+
+    const reservas = response.data.reservas || [];
+  const barbeiros = response.data.barbeiros || [];
+
+    if (!reservas.length) {
+      alert("Não há reservas neste período.");
+      return;
+    }
+
+    const barbeirosMap = {};
+    barbeiros.forEach(b => barbeirosMap[b.id] = b.nome);
+
+    const linhas = reservas.map(r => ({
+      Data: r.data,
+      Hora: r.hora ? r.hora.slice(0, 5) : "",
+      Barbeiro: barbeirosMap[r.barbeiro_id] || "Desconhecido",
+      Cliente: r.cliente_nome,
+      Telemóvel: r.cliente_telemovel,
+      Atendida: r.concluida ? "Sim" : "Não"
+    }));
+
+    const XLSX = window.XLSX;
+    if (!XLSX) {
+      alert("Erro: a biblioteca SheetJS não está carregada. Recarrega a página.");
+      return;
+    }
+
+    const ws = XLSX.utils.json_to_sheet(linhas);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Reservas");
+
+    const nomeFicheiro = `reservas_${mesInicio}_a_${mesFim}.xlsx`;
+
+    try {
+      XLSX.writeFile(wb, nomeFicheiro);
+    } catch (err) {
+      const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+      const blob = new Blob([wbout], { type: "application/octet-stream" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = nomeFicheiro;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    mostrarMensagem("Excel exportado com sucesso!");
+  } catch (err) {
+    console.error("Erro inesperado na exportação:", err);
+    alert("Ocorreu um erro inesperado. Verifica a consola (F12).");
   }
-
-  const reservas = response.data.reservas;
-  const barbeirosMap = {};
-  response.data.barbeiros.forEach(b => barbeirosMap[b.id] = b.nome);
-
-  if (!reservas.length) {
-    alert("Não há reservas neste período.");
-    return;
-  }
-
-  const linhas = reservas.map(r => ({
-    Data: r.data,
-    Hora: r.hora.slice(0, 5),
-    Barbeiro: barbeirosMap[r.barbeiro_id] || "Desconhecido",
-    Cliente: r.cliente_nome,
-    Telemóvel: r.cliente_telemovel,
-    Serviço: r.servico,
-    Atendida: r.concluida ? "Sim" : "Não"
-  }));
-
-  const ws = XLSX.utils.json_to_sheet(linhas);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Reservas");
-  XLSX.writeFile(wb, `reservas_${mesInicio}_a_${mesFim}.xlsx`);
-
-  mostrarMensagem("Excel exportado com sucesso!");
 });
 
 /* ---------------- APAGAR RESERVAS ANTIGAS (SÓ NO DIA 1, UMA VEZ POR MÊS) ---------------- */
