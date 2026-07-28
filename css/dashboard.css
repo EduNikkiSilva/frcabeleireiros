@@ -837,24 +837,23 @@ header strong {
    Footer fixo - dashboard only
    ============================== */
 body.dashboard .site-footer {
-  position: fixed;            /* fixa em relação à janela */
-  left: 50%;                  /* centra horizontalmente */
+  position: fixed;            
+  left: 50%;                  
   transform: translateX(-50%);
-  bottom: 200px;              /* distância do fundo - ajusta conforme desejado */
-  z-index: 1000;              /* acima do conteúdo */
-  width: auto;                /* largura conforme conteúdo (não full-width) */
+  bottom: 200px;              
+  z-index: 1000;              
+  width: auto;                
   padding: 0.6rem 1.2rem;
-  background: transparent;    /* sem bloco branco atrás */
+  background: transparent;    
   box-shadow: none;
   color: var(--text-muted);
-  border-radius: 8px;         /* opcional, estética */
+  border-radius: 8px;         
   pointer-events: auto;
 }
 
-/* Evitar que o conteúdo fique por baixo do footer:
-   ajusta padding-bottom para >= bottom + footerHeight + folga */
+/* Evitar que o conteúdo fique por baixo do footer: */
 body.dashboard .wrapper {
-  padding-bottom: 320px; /* ajuste inicial; diminui/aumenta conforme quiseres */
+  padding-bottom: 320px; 
 }
 
 /* Mobile: reduzir distância e padding para pequenas telas */
@@ -867,3 +866,23 @@ body.dashboard .wrapper {
     padding-bottom: 160px;
   }
 }
+
+/* ==============================Ajuste: empurrar o botão "Guardar férias" para o fundo do card============================== */
+#tab-ferias .card {
+  display: flex;
+  flex-direction: column; /
+}
+
+/* faz o botão primário ficar no fundo do card */
+#tab-ferias .card .btn-primary {
+  margin-top: auto;
+  align-self: stretch;   
+}
+
+#tab-ferias .card .btn-primary {
+  padding-top: 0.85rem;
+  padding-bottom: 0.85rem;
+  /* se quiseres aumentar o espaço entre o botão e o fundo do card, adiciona: */
+  /* margin-bottom: 12px; */
+}
+
