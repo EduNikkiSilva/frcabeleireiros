@@ -1,6 +1,5 @@
 import { nhost } from '../nhost.js';
 import { state } from './state.js';
-import { carregarFeriasRanges } from './feriados.js';
 
 export async function carregarFerias() {
   const query = `
@@ -51,7 +50,16 @@ export async function apagarFerias(id) {
     return;
   }
   await carregarFerias();
-  await carregarFeriasRanges();
+  try {
+    const mod = await import('./feriados.js');
+    if (typeof mod.carregarFeriasRanges === 'function') {
+      await mod.carregarFeriasRanges();
+    } else {
+      console.warn('feriados.js não exporta carregarFeriasRanges');
+    }
+  } catch (err) {
+    console.warn('Erro ao importar feriados.js:', err);
+  }
   if (state.manualPicker) state.manualPicker.redraw();
 }
 
@@ -91,7 +99,16 @@ export function initFeriasListeners() {
 
     state.feriasPicker.clear();
     await carregarFerias();
-    await carregarFeriasRanges();
+    try {
+      const mod = await import('./feriados.js');
+      if (typeof mod.carregarFeriasRanges === 'function') {
+        await mod.carregarFeriasRanges();
+      } else {
+        console.warn('feriados.js não exporta carregarFeriasRanges');
+      }
+    } catch (err) {
+      console.warn('Erro ao importar feriados.js:', err);
+    }
     if (state.manualPicker) state.manualPicker.redraw();
   });
 }

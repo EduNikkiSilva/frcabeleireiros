@@ -116,6 +116,11 @@ header h1 {
   padding: 1.5rem;
   font-size: 0.8rem;
   color: var(--text-muted);
+
+  /* remover qualquer barra branca: */
+  background: transparent !important;
+  border-top: none !important;
+  box-shadow: none !important;
 }
 
 @keyframes fadeInTab {

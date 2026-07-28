@@ -3,12 +3,14 @@ import { state } from './state.js';
 import { mostrarMensagem } from './utils.js';
 
 export async function verificarOwner() {
+  console.log('verificarOwner — barbeiroId =', state.barbeiroId); // tirar depois
   const query = `
     query VerificarOwner($id: uuid!) {
       barbeiros(where: { id: { _eq: $id } }) { owner }
     }
   `;
   const response = await nhost.graphql.request(query, { id: state.barbeiroId });
+  console.log('verificarOwner — barbeiroId =', state.barbeiroId); // tirar depois
   state.isOwner = response.data?.barbeiros?.[0]?.owner || false;
 
   if (state.isOwner) {
@@ -222,6 +224,7 @@ export function initDadosListeners() {
           hora
           cliente_nome
           cliente_telemovel
+          servico
           concluida
           barbeiro_id
         }
@@ -252,12 +255,13 @@ export function initDadosListeners() {
         Hora: r.hora ? r.hora.slice(0, 5) : "",
         Barbeiro: barbeirosMap[r.barbeiro_id] || "Desconhecido",
         Cliente: r.cliente_nome,
-        Telemóvel: r.cliente_telemovel,
+        "Telemóvel": r.cliente_telemovel,
+        "Serviço": r.servico || "",
         Atendida: r.concluida ? "Sim" : "Não"
       }));
 
-      const XLSX = window.XLSX;
-      if (!XLSX) { alert("Erro: a biblioteca SheetJS não está carregada. Recarrega a página."); return; }
+      // Importar SheetJS dinamicamente (ESM)
+      const XLSX = await import("https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.mjs");
 
       const ws = XLSX.utils.json_to_sheet(linhas);
       const wb = XLSX.utils.book_new();

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
   <meta charset="UTF-8" />
   <title>Painel Staff - FR Cabeleireiros</title>
@@ -8,9 +9,6 @@
   <!-- FLATPICKR -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
-  <!-- SheetJS (exportar Excel) -->
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 
   <!-- CSS -->
   <link rel="stylesheet" href="css/dashboard.css">
@@ -21,225 +19,229 @@
 
 <body>
 
-<header>
-  <div class="header-top">
-    <div class="logo-area">
-      <a href="#" onclick="location.reload(); return false;">
-        <img src="img/fr.png" class="logo">
-      </a>
-      <strong>FR Cabeleireiros · Painel de Colaborador</strong>
-    </div>
-
-    <div class="header-actions">
-      <div class="tabs-nav">
-        <button class="tab-btn active" data-tab="tab-marcacoes">📅 Marcações</button>
-        <button class="tab-btn" data-tab="tab-ferias">🏖️ Férias</button>
-        <button class="tab-btn" data-tab="tab-pausas">☕ Pausas</button>
-        <button class="tab-btn" data-tab="tab-conta">⚙️ A minha conta</button>
-        <button class="tab-btn" data-tab="tab-dados" id="tab-btn-dados" style="display:none;">📦 Dados</button>
+  <header>
+    <div class="header-top">
+      <div class="logo-area">
+        <a href="#" onclick="location.reload(); return false;">
+          <img src="img/fr.png" class="logo">
+        </a>
+        <strong>FR Cabeleireiros · Painel de Colaborador</strong>
       </div>
 
-      <button id="logout-btn" title="Sair">
-        <img id="logout-foto" src="" alt="Sair" class="logout-foto">
-        <span class="logout-overlay">Sair</span>
-      </button>
-    </div>
-  </div>
-</header>
-
-<div class="wrapper">
-
-  <div id="bemvindo"></div>
-
-  <!-- CAIXA DE NOTIFICAÇÕES (só visível para owner) -->
-  <div id="notificacoes-box" style="display:none;">
-    <div class="notificacao-header">
-      <span>🔔 Notificações</span>
-      <button id="notificacao-fechar" title="Fechar">✕</button>
-    </div>
-    <div id="notificacao-conteudo"></div>
-  </div>
-
-  <!-- ABA: MARCAÇÕES -->
-  <section class="tab-content active" id="tab-marcacoes">
-    <div class="marcacoes-grid">
-
-      <!-- COLUNA ESQUERDA: LISTA -->
-      <section class="card">
-        <h2>As minhas marcações</h2>
-        <p id="resumo-hoje" class="resumo-dia"></p>
-
-        <div class="list" id="lista-reservas">
-          <div class="list-empty">Sem marcações.</div>
+      <div class="header-actions">
+        <div class="tabs-nav">
+          <button class="tab-btn active" data-tab="tab-marcacoes">📅 Marcações</button>
+          <button class="tab-btn" data-tab="tab-ferias">🏖️ Férias</button>
+          <button class="tab-btn" data-tab="tab-pausas">☕ Pausas</button>
+          <button class="tab-btn" data-tab="tab-conta">⚙️ A minha conta</button>
+          <button class="tab-btn" data-tab="tab-dados" id="tab-btn-dados" style="display:none;">📦 Dados</button>
         </div>
 
-        <button id="btn-historico" class="btn-secondary" style="margin-top:1rem;">
-          📅 Ver histórico
+        <button id="logout-btn" title="Sair">
+          <img id="logout-foto" src="img/fr.png" alt="Sair" class="logout-foto" onerror="this.style.display='none'">
+          <span class="logout-overlay">Sair</span>
         </button>
+      </div>
+    </div>
+  </header>
 
-        <div id="historico-filtros" style="display:none; margin-top:0.7rem;">
+  <div class="wrapper">
+
+    <div id="bemvindo"></div>
+
+    <!-- CAIXA DE NOTIFICAÇÕES (só visível para owner) -->
+    <div id="notificacoes-box" style="display:none;">
+      <div class="notificacao-header">
+        <span>🔔 Notificações</span>
+        <button id="notificacao-fechar" title="Fechar">✕</button>
+      </div>
+      <div id="notificacao-conteudo"></div>
+    </div>
+
+    <!-- ABA: MARCAÇÕES -->
+    <section class="tab-content active" id="tab-marcacoes">
+      <div class="marcacoes-grid">
+
+        <!-- COLUNA ESQUERDA: LISTA -->
+        <section class="card">
+          <h2>As minhas marcações</h2>
+          <p id="resumo-hoje" class="resumo-dia"></p>
+
+          <div class="list" id="lista-reservas">
+            <div class="list-empty">Sem marcações.</div>
+          </div>
+
+          <button id="btn-historico" class="btn-secondary" style="margin-top:1rem;">
+            📅 Ver histórico
+          </button>
+
+          <div id="historico-filtros" style="display:none; margin-top:0.7rem;">
+            <div class="form-row">
+              <div>
+                <label>Ver um dia específico</label>
+                <input type="date" id="historico-dia" class="input-modern" />
+              </div>
+              <div>
+                <label>Ver um mês inteiro</label>
+                <input type="month" id="historico-mes" class="input-modern" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- COLUNA DIREITA: FORMULÁRIO MANUAL -->
+        <section class="card">
+          <h2>Registar marcação manual</h2>
+          <p class="form-hint">Para clientes que ligam por telefone</p>
+
           <div class="form-row">
             <div>
-              <label>Ver um dia específico</label>
-              <input type="date" id="historico-dia" class="input-modern" />
+              <label>Data</label>
+              <input type="text" id="manual-data" class="input-modern" placeholder="Escolhe a data" />
             </div>
             <div>
-              <label>Ver um mês inteiro</label>
-              <input type="month" id="historico-mes" class="input-modern" />
+              <label>Hora</label>
+              <select id="manual-hora" class="input-modern">
+                <option value="">Escolhe a data primeiro</option>
+              </select>
             </div>
           </div>
-        </div>
-      </section>
 
-      <!-- COLUNA DIREITA: FORMULÁRIO MANUAL -->
-      <section class="card">
-        <h2>Registar marcação manual</h2>
-        <p class="form-hint">Para clientes que ligam por telefone</p>
+          <label>Serviço</label>
+          <select id="manual-servico" class="input-modern">
+            <option value="corte e lavagem">Corte e Lavagem</option>
+          </select>
 
-        <div class="form-row">
-          <div>
-            <label>Data</label>
-            <input type="text" id="manual-data" class="input-modern" placeholder="Escolhe a data" />
+          <div class="form-row">
+            <div>
+              <label>Nome do cliente</label>
+              <input type="text" id="manual-nome" class="input-modern" placeholder="Nome" />
+            </div>
+            <div>
+              <label>Telemóvel</label>
+              <input type="tel" id="manual-telemovel" class="input-modern" placeholder="9XXXXXXXX" />
+            </div>
           </div>
-          <div>
-            <label>Hora</label>
-            <select id="manual-hora" class="input-modern">
-              <option value="">Escolhe a data primeiro</option>
-            </select>
-          </div>
-        </div>
 
-        <label>Serviço</label>
-        <select id="manual-servico" class="input-modern">
-          <option value="corte e lavagem">Corte e Lavagem</option>
-        </select>
+          <button id="btn-add-manual" class="btn-primary">➕ Registar marcação</button>
+        </section>
 
-        <div class="form-row">
-          <div>
-            <label>Nome do cliente</label>
-            <input type="text" id="manual-nome" class="input-modern" placeholder="Nome" />
-          </div>
-          <div>
-            <label>Telemóvel</label>
-            <input type="tel" id="manual-telemovel" class="input-modern" placeholder="9XXXXXXXX" />
-          </div>
-        </div>
-
-        <button id="btn-add-manual" class="btn-primary">➕ Registar marcação</button>
-      </section>
-
-    </div>
-  </section>
-
-  <!-- ABA: FÉRIAS -->
-  <section class="tab-content" id="tab-ferias">
-    <section class="card card-full">
-      <h2>Férias</h2>
-
-      <div class="list" id="lista-ferias">
-        <div class="list-empty">Sem férias registadas.</div>
       </div>
-
-      <h3 class="subtitle">Adicionar férias</h3>
-
-      <label>Escolhe o período (clica no primeiro e no último dia)</label>
-      <input type="text" id="ferias-range" class="input-modern" placeholder="Escolhe o intervalo de férias" />
-
-      <button id="btn-add-ferias" class="btn-primary">➕ Guardar férias</button>
     </section>
-  </section>
 
-  <!-- ABA: PAUSAS -->
-  <section class="tab-content" id="tab-pausas">
-    <div class="marcacoes-grid">
+    <!-- ABA: FÉRIAS -->
+    <section class="tab-content" id="tab-ferias">
+      <section class="card card-full">
+        <h2>Férias</h2>
 
-      <!-- COLUNA ESQUERDA: LISTA -->
-      <section class="card">
-        <h2>Pausas / Almoço</h2>
-
-        <div class="list" id="lista-pausas">
-          <div class="list-empty">Sem pausas registadas.</div>
+        <div class="list" id="lista-ferias">
+          <div class="list-empty">Sem férias registadas.</div>
         </div>
-      </section>
 
-      <!-- COLUNA DIREITA: FORMULÁRIO -->
-      <section class="card">
-        <h2>Adicionar pausa</h2>
+        <h3 class="subtitle">Adicionar férias</h3>
 
         <label>Escolhe o período (clica no primeiro e no último dia)</label>
-        <input type="text" id="pausa-range" class="input-modern" placeholder="Escolhe o intervalo de dias" />
+        <input type="text" id="ferias-range" class="input-modern" placeholder="Escolhe o intervalo de férias" />
 
-        <div class="form-row">
-          <div>
-            <label>Hora início</label>
-            <input type="text" id="pausa-inicio" class="input-modern" placeholder="Escolhe a hora" />
-          </div>
-          <div>
-            <label>Hora fim</label>
-            <input type="text" id="pausa-fim" class="input-modern" placeholder="Escolhe a hora" />
-          </div>
-        </div>
-
-        <button id="btn-add-pausa" class="btn-primary">➕ Guardar pausa</button>
+        <button id="btn-add-ferias" class="btn-primary">➕ Guardar férias</button>
       </section>
+    </section>
 
-    </div>
-  </section>
+    <!-- ABA: PAUSAS -->
+    <section class="tab-content" id="tab-pausas">
+      <div class="marcacoes-grid">
 
-<!-- ABA: CONTA -->
-  <section class="tab-content" id="tab-conta">
-    <div class="conta-header">
-      <img class="conta-avatar-foto" id="conta-avatar-foto" src="" alt="Foto de perfil" style="display:none;">
-      <span class="conta-avatar" id="conta-avatar">?</span>
-      <div>
-        <h2 style="margin:0; text-transform:none; font-size:1.3rem;">A minha conta</h2>
-        <p class="conta-username">Sessão iniciada como <strong id="conta-username-atual">...</strong></p>
+        <!-- COLUNA ESQUERDA: LISTA -->
+        <section class="card">
+          <h2>Pausas / Almoço</h2>
+
+          <div class="list" id="lista-pausas">
+            <div class="list-empty">Sem pausas registadas.</div>
+          </div>
+        </section>
+
+        <!-- COLUNA DIREITA: FORMULÁRIO -->
+        <section class="card">
+          <h2>Adicionar pausa</h2>
+
+          <label>Escolhe o período (clica no primeiro e no último dia)</label>
+          <input type="text" id="pausa-range" class="input-modern" placeholder="Escolhe o intervalo de dias" />
+
+          <div class="form-row">
+            <div>
+              <label>Hora início</label>
+              <input type="text" id="pausa-inicio" class="input-modern" placeholder="Escolhe a hora" />
+            </div>
+            <div>
+              <label>Hora fim</label>
+              <input type="text" id="pausa-fim" class="input-modern" placeholder="Escolhe a hora" />
+            </div>
+          </div>
+
+          <button id="btn-add-pausa" class="btn-primary">➕ Guardar pausa</button>
+        </section>
+
       </div>
-    </div>
+    </section>
 
-    <div class="marcacoes-grid">
-
-      <!-- COLUNA ESQUERDA: CONFIRMAR IDENTIDADE -->
-      <section class="card">
-        <h2>🔑 Confirmar identidade</h2>
-        <p class="form-hint">Introduz a tua password atual para poderes alterar os dados ao lado</p>
-
-        <label>Password atual</label>
-        <div class="password-wrapper">
-          <input type="password" id="conta-password-atual" class="input-modern" placeholder="Password atual" />
-          <button type="button" class="toggle-password" data-target="conta-password-atual">👁️</button>
+    <!-- ABA: CONTA -->
+    <section class="tab-content" id="tab-conta">
+      <div class="conta-header">
+        <img class="conta-avatar-foto" id="conta-avatar-foto" src="img/fr.png" alt="Foto de perfil"
+          style="display:none;" onerror="this.style.display='none'">
+        <span class="conta-avatar" id="conta-avatar">?</span>
+        <div>
+          <h2 style="margin:0; text-transform:none; font-size:1.3rem;">A minha conta</h2>
+          <p class="conta-username">Sessão iniciada como <strong id="conta-username-atual">...</strong></p>
         </div>
+      </div>
 
-        <p class="conta-aviso">🔒 Usa uma password que só tu conheces e não partilhes com ninguém.</p>
-      </section>
+      <div class="marcacoes-grid">
 
-      <!-- COLUNA DIREITA: NOVOS DADOS -->
-      <section class="card">
-        <h2>✏️ Novos dados</h2>
-        <p class="form-hint">Deixa em branco o que não quiseres alterar</p>
+        <!-- COLUNA ESQUERDA: CONFIRMAR IDENTIDADE -->
+        <section class="card">
+          <h2>🔑 Confirmar identidade</h2>
+          <p class="form-hint">Introduz a tua password atual para poderes alterar os dados ao lado</p>
 
-        <label>Novo username</label>
-        <input type="text" id="conta-novo-username" class="input-modern" placeholder="Deixa em branco para não alterar" />
+          <label>Password atual</label>
+          <div class="password-wrapper">
+            <input type="password" id="conta-password-atual" class="input-modern" placeholder="Password atual" />
+            <button type="button" class="toggle-password" data-target="conta-password-atual">👁️</button>
+          </div>
 
-        <label>Nova password</label>
-        <div class="password-wrapper">
-          <input type="password" id="conta-nova-password" class="input-modern" placeholder="Deixa em branco para não alterar" />
-          <button type="button" class="toggle-password" data-target="conta-nova-password">👁️</button>
-        </div>
+          <p class="conta-aviso">🔒 Usa uma password que só tu conheces e não partilhes com ninguém.</p>
+        </section>
 
-        <label>Confirmar nova password</label>
-        <div class="password-wrapper">
-          <input type="password" id="conta-confirmar-password" class="input-modern" placeholder="Repete a nova password" />
-          <button type="button" class="toggle-password" data-target="conta-confirmar-password">👁️</button>
-        </div>
+        <!-- COLUNA DIREITA: NOVOS DADOS -->
+        <section class="card">
+          <h2>✏️ Novos dados</h2>
+          <p class="form-hint">Deixa em branco o que não quiseres alterar</p>
 
-        <button id="btn-guardar-conta" class="btn-primary">💾 Guardar alterações</button>
-      </section>
+          <label>Novo username</label>
+          <input type="text" id="conta-novo-username" class="input-modern"
+            placeholder="Deixa em branco para não alterar" />
 
-    </div>
-  </section>
+          <label>Nova password</label>
+          <div class="password-wrapper">
+            <input type="password" id="conta-nova-password" class="input-modern"
+              placeholder="Deixa em branco para não alterar" />
+            <button type="button" class="toggle-password" data-target="conta-nova-password">👁️</button>
+          </div>
 
-  <!-- ABA: DADOS (só para o owner) -->
+          <label>Confirmar nova password</label>
+          <div class="password-wrapper">
+            <input type="password" id="conta-confirmar-password" class="input-modern"
+              placeholder="Repete a nova password" />
+            <button type="button" class="toggle-password" data-target="conta-confirmar-password">👁️</button>
+          </div>
+
+          <button id="btn-guardar-conta" class="btn-primary">💾 Guardar alterações</button>
+        </section>
+
+      </div>
+    </section>
+
+    <!-- ABA: DADOS (só para o owner) -->
     <section class="tab-content" id="tab-dados">
       <section class="card card-full">
         <h2>📦 Gestão de Dados</h2>
@@ -266,7 +268,8 @@
         <div class="conta-divider"></div>
 
         <h3 class="subtitle">Limpar reservas antigas</h3>
-        <p class="form-hint">Apaga todas as reservas com mais de 2 meses. Exporta primeiro! Só disponível no dia 1 de cada mês.</p>
+        <p class="form-hint">Apaga todas as reservas com mais de 2 meses. Exporta primeiro! Só disponível no dia 1 de
+          cada mês.</p>
 
         <button id="btn-limpar-antigas" class="btn-delete-full">🗑️ Apagar reservas com mais de 2 meses</button>
         <p id="limpeza-status" class="form-hint" style="margin-top:0.6rem;"></p>
@@ -274,38 +277,41 @@
     </section>
   </div>
 
-</div>
-
-<!-- MODAL -->
-<div id="modal-bg">
-  <div id="modal">
-    <h3 id="modal-title">Editar</h3>
-
-    <input type="date" id="modal-data1" class="input-modern">
-    <input type="date" id="modal-data2" class="input-modern">
-    <input type="time" id="modal-hora1" class="input-modern">
-    <input type="time" id="modal-hora2" class="input-modern">
-
-    <button id="modal-save" class="btn-primary">💾 Guardar alterações</button>
-    <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
   </div>
-</div>
 
-<!-- JS -->
-<script type="module" src="js/staff/main.js"></script>
+  <!-- MODAL -->
+  <div id="modal-bg">
+    <div id="modal">
+      <h3 id="modal-title">Editar</h3>
 
-<!-- NAVEGAÇÃO ENTRE ABAS -->
-<script>
-  document.querySelectorAll(".tab-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+      <input type="date" id="modal-data1" class="input-modern">
+      <input type="date" id="modal-data2" class="input-modern">
+      <input type="time" id="modal-hora1" class="input-modern">
+      <input type="time" id="modal-hora2" class="input-modern">
 
-      btn.classList.add("active");
-      document.getElementById(btn.dataset.tab).classList.add("active");
+      <button id="modal-save" class="btn-primary">💾 Guardar alterações</button>
+      <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script type="module" src="js/staff/main.js"></script>
+
+  <!-- NAVEGAÇÃO ENTRE ABAS -->
+  <script>
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+
+        btn.classList.add("active");
+        document.getElementById(btn.dataset.tab).classList.add("active");
+      });
     });
-  });
-</script>
+  </script>
+
+  <footer class="site-footer">FR Cabeleireiros © 2026</footer>
 
 </body>
+
 </html>
