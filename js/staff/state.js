@@ -6,5 +6,6 @@ export const state = {
   feriasRanges: [],
   manualPicker: null,
   feriasPicker: null,
-  pausaPicker: null
+  pausaPicker: null,
+  notificacaoAtual: null
 };

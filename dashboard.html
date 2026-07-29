@@ -37,8 +37,12 @@
           <button class="tab-btn" data-tab="tab-dados" id="tab-btn-dados" style="display:none;">📦 Dados</button>
         </div>
 
+        <button id="notificacao-sino" title="Notificações" style="display:none;">
+          🔔
+          <span id="notificacao-badge" class="notificacao-badge" style="display:none;"></span>
+        </button>
         <button id="logout-btn" title="Sair">
-          <img id="logout-foto" src="img/fr.png" alt="Sair" class="logout-foto" onerror="this.style.display='none'">
+          <img id="logout-foto" src="img/fr.png" alt="Sair" class="logout-foto">
           <span class="logout-overlay">Sair</span>
         </button>
       </div>
@@ -135,20 +139,28 @@
 
     <!-- ABA: FÉRIAS -->
     <section class="tab-content" id="tab-ferias">
-      <section class="card card-full">
-        <h2>Férias</h2>
+      <div class="marcacoes-grid">
 
-        <div class="list" id="lista-ferias">
-          <div class="list-empty">Sem férias registadas.</div>
-        </div>
+        <!-- COLUNA ESQUERDA: LISTA -->
+        <section class="card">
+          <h2>Férias</h2>
 
-        <h3 class="subtitle">Adicionar férias</h3>
+          <div class="list" id="lista-ferias">
+            <div class="list-empty">Sem férias registadas.</div>
+          </div>
+        </section>
 
-        <label>Escolhe o período (clica no primeiro e no último dia)</label>
-        <input type="text" id="ferias-range" class="input-modern" placeholder="Escolhe o intervalo de férias" />
+        <!-- COLUNA DIREITA: FORMULÁRIO -->
+        <section class="card">
+          <h2>Adicionar férias</h2>
 
-        <button id="btn-add-ferias" class="btn-primary">➕ Guardar férias</button>
-      </section>
+          <label>Escolhe o período (clica no primeiro e no último dia)</label>
+          <input type="text" id="ferias-range" class="input-modern" placeholder="Escolhe o intervalo de férias" />
+
+          <button id="btn-add-ferias" class="btn-primary">➕ Guardar férias</button>
+        </section>
+
+      </div>
     </section>
 
     <!-- ABA: PAUSAS -->

@@ -3,23 +3,50 @@ import { state } from './state.js';
 import { mostrarMensagem } from './utils.js';
 
 export async function verificarOwner() {
-  console.log('verificarOwner — barbeiroId =', state.barbeiroId); // tirar depois
   const query = `
     query VerificarOwner($id: uuid!) {
       barbeiros(where: { id: { _eq: $id } }) { owner }
     }
   `;
   const response = await nhost.graphql.request(query, { id: state.barbeiroId });
-  console.log('verificarOwner — barbeiroId =', state.barbeiroId); // tirar depois
   state.isOwner = response.data?.barbeiros?.[0]?.owner || false;
 
   if (state.isOwner) {
     document.getElementById("tab-btn-dados").style.display = "inline-block";
+    document.getElementById("notificacao-sino").style.display = "flex";
+    initSinoListener();
     await verificarReservasAntigas();
     verificarLembreteFimMes();
     await verificarDisponibilidadeLimpeza();
     await verificarAutoLimpeza();
   }
+}
+
+function initSinoListener() {
+  const sino = document.getElementById("notificacao-sino");
+  if (sino.dataset.listenerAtivo) return; // evita duplicar listener
+  sino.dataset.listenerAtivo = "true";
+
+  sino.addEventListener("click", () => {
+    const box = document.getElementById("notificacoes-box");
+    const estaVisivel = box.style.display === "block";
+
+    if (estaVisivel) {
+      box.style.display = "none";
+    } else if (state.notificacaoAtual) {
+      renderizarNotificacao(state.notificacaoAtual);
+      box.style.display = "block";
+    } else {
+      renderizarNotificacao({
+        titulo: "🔔 Sem notificações",
+        mensagem: "Não há avisos pendentes de momento.",
+        urgente: false,
+        onExportar: null,
+        onDispensar: () => { box.style.display = "none"; }
+      });
+      box.style.display = "block";
+    }
+  });
 }
 
 function verificarLembreteFimMes() {
@@ -28,35 +55,49 @@ function verificarLembreteFimMes() {
   const ultimoDia = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).getDate();
   const diasRestantes = ultimoDia - hoje.getDate();
 
+  const badge = document.getElementById("notificacao-badge");
+
   if (diasRestantes > 2) {
+    state.notificacaoAtual = null;
+    badge.style.display = "none";
     document.getElementById("notificacoes-box").style.display = "none";
     return;
   }
 
-  const dispensado = localStorage.getItem("lembrete_fim_mes_dispensado");
-  if (dispensado) {
-    const [ano, mes] = dispensado.split("-").map(Number);
-    if (ano === hoje.getFullYear() && mes === hoje.getMonth()) return;
-  }
+  badge.style.display = "flex";
+  badge.textContent = "1";
 
-  mostrarNotificacao(
-    "📅 Exportar reservas",
-    `Faltam <strong>${diasRestantes + 1} dia(s)</strong> para o fim do mês. Exporta as reservas antigas antes que sejam apagadas automaticamente no dia 1.`,
-    true,
-    () => {
+  const notificacao = {
+    titulo: "📅 Exportar reservas",
+    mensagem: `Faltam <strong>${diasRestantes + 1} dia(s)</strong> para o fim do mês. Exporta as reservas antigas antes que sejam apagadas automaticamente no dia 1.`,
+    urgente: true,
+    onExportar: () => {
       document.getElementById("tab-btn-dados").click();
       document.getElementById("notificacoes-box").style.display = "none";
     },
-    () => {
-      localStorage.setItem("lembrete_fim_mes_dispensado", `${hoje.getFullYear()}-${hoje.getMonth()}`);
+    onDispensar: () => {
       document.getElementById("notificacoes-box").style.display = "none";
     }
-  );
+  };
+
+  state.notificacaoAtual = notificacao;
+
+  // Só mostra automaticamente uma vez por dia (não sempre que abre a página)
+  const jaVistoHoje = localStorage.getItem("notificacao_vista_data") === hoje.toISOString().split("T")[0];
+  if (!jaVistoHoje) {
+    renderizarNotificacao(notificacao);
+    document.getElementById("notificacoes-box").style.display = "block";
+    localStorage.setItem("notificacao_vista_data", hoje.toISOString().split("T")[0]);
+  }
 }
 
-function mostrarNotificacao(titulo, mensagem, urgente, onExportar, onDispensar) {
-  const box = document.getElementById("notificacoes-box");
+function renderizarNotificacao(notificacao) {
   const conteudo = document.getElementById("notificacao-conteudo");
+  const { titulo, mensagem, urgente, onExportar, onDispensar } = notificacao;
+
+  const botaoExportar = onExportar
+    ? `<button class="btn-exportar">📥 Exportar agora</button>`
+    : "";
 
   conteudo.innerHTML = `
     <div class="notificacao-item ${urgente ? 'urgente' : ''}">
@@ -64,16 +105,23 @@ function mostrarNotificacao(titulo, mensagem, urgente, onExportar, onDispensar) 
         <strong>${titulo}</strong>
         <p>${mensagem}</p>
         <div>
-          <button class="btn-exportar">📥 Exportar agora</button>
-          <button class="btn-dispensar">Dispensar</button>
+          ${botaoExportar}
+          <button class="btn-dispensar">Fechar</button>
         </div>
       </div>
     </div>
   `;
 
-  conteudo.querySelector(".btn-exportar").addEventListener("click", onExportar);
+  if (onExportar) conteudo.querySelector(".btn-exportar").addEventListener("click", onExportar);
   conteudo.querySelector(".btn-dispensar").addEventListener("click", onDispensar);
-  box.style.display = "block";
+}
+
+// Mantido para compatibilidade com verificarAutoLimpeza
+function mostrarNotificacao(titulo, mensagem, urgente, onExportar, onDispensar) {
+  const notificacao = { titulo, mensagem, urgente, onExportar, onDispensar };
+  state.notificacaoAtual = notificacao;
+  renderizarNotificacao(notificacao);
+  document.getElementById("notificacoes-box").style.display = "block";
 }
 
 async function verificarAutoLimpeza() {
@@ -261,7 +309,11 @@ export function initDadosListeners() {
       }));
 
       // Importar SheetJS dinamicamente (ESM)
-      const XLSX = await import("https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.mjs");
+      const XLSX = window.XLSX;
+      if (!XLSX) {
+        alert("Erro: a biblioteca SheetJS não está carregada. Recarrega a página.");
+        return;
+      }
 
       const ws = XLSX.utils.json_to_sheet(linhas);
       const wb = XLSX.utils.book_new();
