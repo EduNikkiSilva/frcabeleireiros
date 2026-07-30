@@ -66,7 +66,12 @@ async function gerarHorasManual(dataSelecionada) {
   const pausas = await verificarPausasManual(dataSelecionada);
   const horasReservadas = await obterHorasReservadasManual(dataSelecionada);
 
+  const hoje = new Date().toISOString().split("T")[0];
+  const ehHoje = dataSelecionada === hoje;
+  const agora = new Date().toTimeString().slice(0, 5);
+
   const horasDisponiveis = horasBase.filter(hora => {
+    if (ehHoje && hora <= agora) return false;
     if (horasReservadas.includes(hora)) return false;
     const emPausa = pausas.some(p => hora >= p.inicio && hora <= p.fim);
     return !emPausa;
@@ -107,6 +112,29 @@ export function iniciarFlatpickrManual() {
   });
 }
 
+async function verificarDuplicadoManual(data, cliente_telemovel) {
+  const query = `
+    query VerificarDuplicadoManual($barbeiroId: uuid!, $data: date!, $telemovel: String!) {
+      reservas(where: {
+        barbeiro_id: { _eq: $barbeiroId },
+        data: { _eq: $data },
+        cliente_telemovel: { _eq: $telemovel }
+      }) {
+        id
+        hora
+      }
+    }
+  `;
+
+  const response = await nhost.graphql.request(query, {
+    barbeiroId: state.barbeiroId,
+    data,
+    telemovel: cliente_telemovel
+  });
+
+  return response.data?.reservas || [];
+}
+
 export function initMarcacaoManualListeners() {
   document.getElementById("btn-add-manual").addEventListener("click", async () => {
     const data = document.getElementById("manual-data").value;
@@ -118,6 +146,16 @@ export function initMarcacaoManualListeners() {
     if (!data || !hora || !servico || !cliente_nome || !cliente_telemovel) {
       alert("Preenche todos os campos.");
       return;
+    }
+
+    const duplicados = await verificarDuplicadoManual(data, cliente_telemovel);
+
+    if (duplicados.length > 0) {
+      const horasExistentes = duplicados.map(r => r.hora.slice(0, 5)).join(", ");
+      const confirmar = confirm(
+        `Este cliente já tem marcação neste dia às ${horasExistentes}.\n\nQueres registar mesmo assim outra reserva para as ${hora}?`
+      );
+      if (!confirmar) return;
     }
 
     const mutation = `

@@ -11,7 +11,9 @@ export async function carregarReservas() {
         data: { _eq: $data }
       }, order_by: { hora: asc }) {
         id
+        data
         hora
+        servico
         cliente_nome
         cliente_telemovel
         concluida
@@ -48,6 +50,9 @@ export async function carregarReservas() {
         <strong>${r.cliente_nome}</strong>
         <a href="tel:${r.cliente_telemovel}">📞 ${r.cliente_telemovel}</a>
       </div>
+      <button class="btn-small edit-btn" onclick='abrirModal("reserva", "${r.id}", ${JSON.stringify(r)}, {"tipo":"hoje"})' title="Editar marcação">
+        ✏️
+      </button>
       <button class="btn-concluir ${r.concluida ? 'ativo' : ''}" onclick="alternarConcluida('${r.id}', ${!r.concluida})" title="${r.concluida ? 'Marcar como não atendida' : 'Marcar como atendida'}">
         ✅
       </button>

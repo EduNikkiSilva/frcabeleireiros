@@ -1,6 +1,7 @@
 import { nhost } from '../nhost.js';
 import { state } from './state.js';
 import { mostrarMensagem } from './utils.js';
+import { carregarReservas } from './reservas.js';
 
 export async function carregarHistorico(inicio, fim, mostrarApenasHora) {
   const query = `
@@ -12,6 +13,7 @@ export async function carregarHistorico(inicio, fim, mostrarApenasHora) {
         id
         data
         hora
+        servico
         cliente_nome
         cliente_telemovel
         concluida
@@ -29,6 +31,8 @@ export async function carregarHistorico(inicio, fim, mostrarApenasHora) {
     return;
   }
 
+  const contexto = JSON.stringify({ tipo: "historico", inicio, fim, mostrarApenasHora });
+
   data.forEach(r => {
     const div = document.createElement("div");
     div.className = "reserva-item" + (r.concluida ? " concluida" : "");
@@ -40,6 +44,9 @@ export async function carregarHistorico(inicio, fim, mostrarApenasHora) {
         <strong>${r.cliente_nome}</strong>
         <a href="tel:${r.cliente_telemovel}">📞 ${r.cliente_telemovel}</a>
       </div>
+      <button class="btn-small edit-btn" onclick='abrirModal("reserva", "${r.id}", ${JSON.stringify(r)}, ${contexto})' title="Editar marcação">
+        ✏️
+      </button>
       <button class="btn-concluir ${r.concluida ? 'ativo' : ''}" onclick="alternarConcluidaHistorico('${r.id}', ${!r.concluida}, '${inicio}', '${fim}', ${mostrarApenasHora})" title="${r.concluida ? 'Marcar como não atendida' : 'Marcar como atendida'}">
         ✅
       </button>
@@ -88,6 +95,13 @@ export function initHistoricoListeners() {
   document.getElementById("btn-historico").addEventListener("click", () => {
     const filtros = document.getElementById("historico-filtros");
     filtros.style.display = filtros.style.display === "none" ? "block" : "none";
+  });
+
+  document.getElementById("btn-hoje").addEventListener("click", async () => {
+    document.getElementById("historico-dia").value = "";
+    document.getElementById("historico-mes").value = "";
+    document.getElementById("historico-filtros").style.display = "none";
+    await carregarReservas();
   });
 
   document.getElementById("historico-dia").addEventListener("change", async (e) => {

@@ -167,7 +167,12 @@ async function gerarHoras(diaSemana, barbeiroId, dataSelecionada) {
   const pausas = await verificarPausas(barbeiroId, dataSelecionada);
   const horasReservadas = await obterHorasReservadas(barbeiroId, dataSelecionada);
 
+  const hoje = new Date().toISOString().split("T")[0];
+  const ehHoje = dataSelecionada === hoje;
+  const agora = new Date().toTimeString().slice(0, 5);
+
   let horasDisponiveis = horasBase.filter(hora => {
+    if (ehHoje && hora <= agora) return false;
     if (horasReservadas.includes(hora)) return false;
 
     const emPausa = pausas.some(p => hora >= p.inicio && hora <= p.fim);
@@ -258,6 +263,29 @@ form.barber.addEventListener("change", async () => {
 /* ============================
    SUBMETER MARCAÇÃO
 ============================ */
+async function verificarDuplicado(barbeiroId, data, cliente_telemovel) {
+  const query = `
+    query VerificarDuplicado($barbeiroId: uuid!, $data: date!, $telemovel: String!) {
+      reservas(where: {
+        barbeiro_id: { _eq: $barbeiroId },
+        data: { _eq: $data },
+        cliente_telemovel: { _eq: $telemovel }
+      }) {
+        id
+        hora
+      }
+    }
+  `;
+
+  const response = await nhost.graphql.request(query, {
+    barbeiroId,
+    data,
+    telemovel: cliente_telemovel
+  });
+
+  return response.data?.reservas || [];
+}
+
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -271,6 +299,16 @@ form.addEventListener("submit", async (e) => {
   if (!barbeiroId || !servico || !data || !hora || !cliente_nome || !cliente_telemovel) {
     alert("Preenche todos os campos.");
     return;
+  }
+
+  const duplicados = await verificarDuplicado(barbeiroId, data, cliente_telemovel);
+
+  if (duplicados.length > 0) {
+    const horasExistentes = duplicados.map(r => r.hora.slice(0, 5)).join(", ");
+    const confirmar = confirm(
+      `Já tens uma marcação neste dia às ${horasExistentes}.\n\nQueres marcar mesmo assim outra reserva para as ${hora}?`
+    );
+    if (!confirmar) return;
   }
 
   const mutation = `
